@@ -1,85 +1,40 @@
-
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id= "@+id/myTextView"
-        android:layout_width= "wrap_content"
-        android:layout_height= "wrap_content"
-        android:layout_gravity= "center"
-        android:gravity= "end"
-        android:text= "MEAT" />
-
-    <!--Feature: Calender-->
-
-    <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/CustomCalendarTheme"
-        android:dateTextAppearance="@style/CustomDateTextAppearance"
-        android:weekDayTextAppearance="@style/CustomWeekDayTextAppearance" />
-
-    <style name="CustomCalendarTheme" parent="Theme.MaterialComponents.DayNight">
-        <item name="colorPrimary">@color/primary_color</item>
-        <item name="colorAccent">@color/accent_color</item>
-    </style>
-
-    <style name="CustomDateTextAppearance" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">@color/date_text_color</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="CustomWeekDayTextAppearance" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textColor">@color/week_day_text_color</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-    
-
-    <Button
-        android:id="@+id/myButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="beef" />
-</LinearLayout>
-
-<!--prof freddy
-<TextView
-        android:id= "@+id/myTextView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity= "center"
-        android:gravity= "center"
-        android:text="A5" />
-<Button
-        android:id="@+id/myButton2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="pork" />
--->
-
-<!--<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/teal"
     tools:context=".MainActivity">
 
+<!--    Feature: Calendar-->
+    <!--TextView to display the date -->
     <TextView
+        android:id="@+id/date_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="MEATTT"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/calendar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- CalendarView to display the Calendar -->
+    <CalendarView
+        android:id="@+id/calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498" />
+
+
+    <!--closing code dont touch-->
 </androidx.constraintlayout.widget.ConstraintLayout>
--->
