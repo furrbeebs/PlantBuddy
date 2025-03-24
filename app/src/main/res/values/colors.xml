@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="teal">#81b7a9</color>
+    <color name="teal">#FFFFFFFF</color> <!--used for calendar-->
 
     <color name="accent_color">#03DAC5</color>
     <color name="page_background">#81b7a9 </color> <!-- background: "teal" -->
@@ -11,5 +11,9 @@
     <!-- calendar -->
     <color name="date_text_color">#000000</color>
     <color name="week_day_text_color">#FF000000</color>
+
+    <!--light mode-->
+    <color name="backgroundColor">#FCFCFC</color>
+    <color name="textColor">#000000</color>
 
 </resources>

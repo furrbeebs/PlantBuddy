@@ -29,3 +29,4 @@
 </manifest>
 
 <!--android:theme="@style/AppTheme" add after android:exported="true" in activity-->
+<!--comments cannot be inserted within the code in this file, if you want to add comment, add below here-->
