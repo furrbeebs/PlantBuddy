@@ -16,4 +16,9 @@
     <color name="backgroundColor">#FCFCFC</color>
     <color name="textColor">#000000</color>
 
+    <color name="mint_green">#7FCFBA</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="dark_gray">#787878</color>
+    <color name="check_green">#4CAF50</color>
+
 </resources>
