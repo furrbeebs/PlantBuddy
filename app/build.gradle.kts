@@ -41,4 +41,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.airbnb.android:lottie:6.6.4") //for animation
+    implementation("com.google.android.material:material:1.9.0") //for better text style
+    implementation("androidx.appcompat:appcompat:1.6.1")
 }

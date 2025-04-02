@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/goalItemContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Goal Title -->
+        <TextView
+            android:id="@+id/goalTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/sun_points"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Take a stretch break" />
+
+        <!-- Sun Points -->
+        <TextView
+            android:id="@+id/sun_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="4dp"
+            android:textColor="#FFC107"
+            android:textSize="14sp"
+            app:drawableEndCompat="@drawable/ic_sun"
+            app:layout_constraintBottom_toBottomOf="@id/goalTitle"
+            app:layout_constraintEnd_toStartOf="@id/checkboxContainer"
+            app:layout_constraintTop_toTopOf="@id/goalTitle"
+            tools:text="3" />
+
+        <!-- Frequency Row -->
+        <LinearLayout
+            android:id="@+id/frequencyContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/goalTitle">
+
+            <ImageView
+                android:id="@+id/frequencyIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="4dp"
+                app:srcCompat="@drawable/ic_repeat" />
+
+            <TextView
+                android:id="@+id/goalFrequency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#757575"
+                android:textSize="12sp"
+                tools:text="Daily" />
+        </LinearLayout>
+
+        <!-- Edit Button -->
+        <ImageButton
+            android:id="@+id/editButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Edit goal"
+            android:padding="4dp"
+            app:layout_constraintBottom_toBottomOf="@id/frequencyContainer"
+            app:layout_constraintStart_toEndOf="@id/frequencyContainer"
+            app:layout_constraintTop_toTopOf="@id/frequencyContainer"
+            app:srcCompat="@drawable/ic_edit" />
+
+        <!-- Checkbox Container -->
+        <FrameLayout
+            android:id="@+id/checkboxContainer"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/checkboxBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Complete goal"
+                app:srcCompat="@drawable/checkbox_unchecked" />
+
+            <ImageView
+                android:id="@+id/checkmark"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:contentDescription="Completed"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_check" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

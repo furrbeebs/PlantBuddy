@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#B1009688">
+
+    <!-- New Goal Dialog Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/newGoalCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:elevation="20dp"
+        app:cardCornerRadius="30dp"
+        app:cardBackgroundColor="@android:color/white">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <!-- Goal Icon -->
+            <ImageView
+                android:id="@+id/goalIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_goal"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true" />
+
+            <!-- Close Button -->
+            <ImageButton
+                android:id="@+id/closeButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="@string/close_button_description"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true" />
+
+            <!-- Goal Input Field -->
+            <EditText
+                android:id="@+id/goalInput"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@id/goalIcon"
+                android:layout_marginTop="16dp"
+                android:hint="Enter a new goal..."
+                android:inputType="textCapSentences"
+                android:background="@android:color/transparent"
+                android:textColorHint="#AAAAAA" />
+
+            <!-- Date Button -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dateChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/goalInput"
+                android:layout_marginTop="16dp"
+                android:text="24 Feb 2025"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                app:chipIcon="@drawable/ic_calendar"
+                app:chipIconTint="#555555"
+                app:chipBackgroundColor="#C5E1D9" />
+
+            <!-- Frequency Button -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/frequencyChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dateChip"
+                android:text="Daily"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                app:chipIcon="@drawable/ic_repeat"
+                app:chipIconTint="#555555"
+                app:chipBackgroundColor="#C5E1D9" />
+
+            <!-- Difficulty Button -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/difficultyChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/frequencyChip"
+                android:text="Easy"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                app:chipIcon="@drawable/ic_chart"
+                app:chipIconTint="#555555"
+                app:chipBackgroundColor="#C5E1D9" />
+
+            <!-- Done Button -->
+            <Button
+                android:id="@+id/doneButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dateChip"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="50dp"
+                android:text="Done"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#5CBEAA"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Suggestions Title -->
+    <TextView
+        android:id="@+id/suggestionsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/newGoalCard"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Suggestions"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- Scrollable suggestions list -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/suggestionsScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/suggestionsTitle"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="16dp"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Compliment someone"
+                    android:textStyle="bold"
+                    android:textColor="#555555" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Clean your room"
+                    android:textStyle="bold"
+                    android:textColor="#555555" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Do your laundry"
+                    android:textStyle="bold"
+                    android:textColor="#555555" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Meditate for 5 minutes"
+                    android:textStyle="bold"
+                    android:textColor="#555555" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="2dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="Read a book"
+                    android:textStyle="bold"
+                    android:textColor="#555555" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>
