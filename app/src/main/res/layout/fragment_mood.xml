@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mood_fragment_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--    Feature: Mood-->
-<!--    to include mood selection options-->
+    <!-- Calendar view -->
+    <com.example.app0.moodtracker.MoodCalendarView
+        android:id="@+id/mood_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
 
-    <!--closing code dont touch-->
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Details section for showing selected date mood -->
+    <LinearLayout
+        android:id="@+id/mood_details_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mood_calendar"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/selected_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your mood: "/>
+
+            <ImageView
+                android:id="@+id/selected_mood"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/mood_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+    <!-- The mood input dialog will be added dynamically in the fragment code -->
+
+    <FrameLayout
+        android:id="@+id/mood_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mood_details_container"/>
+</RelativeLayout>

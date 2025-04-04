@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.example.app0.fragments.MoodFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,29 +20,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // the xml file
 
-        // initialise button
-        Button btn = findViewById(R.id.modebutt);
+        if (savedInstanceState == null) {
+            // Create MoodFragment instance
+            MoodFragment moodFragment = new MoodFragment();
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Use intent to go to activity page
-                Intent intent = new Intent(MainActivity.this);
-                startActivity(intent);
-            }
-        });
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mood_fragment_container, moodFragment)
+                    .commit();
+
+            // Create a Bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putString("selectedDate", "2025-04-03"); // Example of passing selected date
+            moodFragment.setArguments(bundle);
+
+            // Add the fragment to the container
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.mood_fragment_container, moodFragment);
+            transaction.commit();
 
 
-        // calendar
-        CalendarView calendar = findViewById(R.id.calendar);
-        TextView dateView = findViewById(R.id.date_view);
-
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                String date = dayOfMonth + "-" + (month + 1) + "-" + year;
-                dateView.setText(date);
-            }
-        });
+        }
     }
 }

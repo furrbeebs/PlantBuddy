@@ -1,56 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="backgroundColor"
-    tools:context=".MainActivity">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <!--    Feature: Calendar  TO BE MODIFIED FOR CUSTOMCALENDAR-->
-    <!--TextView to display the date -->
-    <TextView
-        android:id="@+id/date_view"
-        android:layout_width="wrap_content"
+    <!-- Month and Year Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
 
-        android:text="MEATTT"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="textColor"
+        <ImageButton
+            android:id="@+id/prevMonthButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_left" />
 
-        app:layout_constraintBottom_toTopOf="@+id/calendar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/monthYearText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-    <!-- CalendarView to display the Calendar -->
-    <CalendarView
-        android:id="@+id/calendar"
-        android:layout_width="wrap_content"
+        <ImageButton
+            android:id="@+id/nextMonthButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_right" />
+    </LinearLayout>
+
+    <!-- Calendar Grid -->
+    <GridLayout
+        android:id="@+id/calendarGrid"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        android:columnCount="7"
+        android:orientation="horizontal"
+        android:useDefaultMargins="true" />
 
-    <Button
-        android:id="@+id/modebutt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="mode"
-
-
-        tools:layout_editor_absoluteX="322dp"
-        tools:layout_editor_absoluteY="0dp" />
-    <!--'tools' is location of the button on the screen-->
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!--closing code dont touch-->
-    </androidx.constraintlayout.widget.ConstraintLayout>
+<!--closing code dont touch-->
+</LinearLayout>
