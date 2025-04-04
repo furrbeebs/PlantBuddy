@@ -1,151 +1,259 @@
 package com.example.app0.moodtracker;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.example.app0.R;
-import com.example.app0.ui.CustomCalendarView;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class MoodCalendarView extends CustomCalendarView {
-    private Context context;
-    private OnDateClickListener dateClickListener;
-    private Map<Long, String> moodData = new HashMap<>();
+public class MoodCalendarView extends LinearLayout {
 
-    // Constructor
-    public MoodCalendarView(Context context, AttributeSet attrs) {
+    private TextView monthYearText;
+    private GridView calendarGrid;
+    private CalendarAdapter adapter;
+    private Calendar currentCalendar = Calendar.getInstance();
+    private OnDateSelectedListener dateSelectedListener;
+
+    // Map to store mood data: date string -> MoodEntry
+    private Map<String, MoodEntry> moodEntries = new HashMap<>();
+
+    public MoodCalendarView(Context context) {
+        super(context);
+        init(context);
+    }
+
+    public MoodCalendarView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
-        init();
+        init(context);
     }
 
-    public interface OnDateClickListener {
-        void onDateClick(View view, Date date);
-    }
+    private void init(Context context) {
+        LayoutInflater.from(context).inflate(R.layout.calendar_layout, this, true);
 
-    // Initialize the calendar view
-    private void init() {
-        // Override the default date click listener
-        super.setOnDateClickListener(new OnDateClickListener() {
-            @Override
-            public void onDateClick(View view, Date date) {
-                // Call the custom date click listener if set
-                if (dateClickListener != null) {
-                    dateClickListener.onDateClick(view, date);
+        // Initialize views
+        monthYearText = findViewById(R.id.month_year_text);
+        calendarGrid = findViewById(R.id.calendar_grid);
+        ImageButton prevButton = findViewById(R.id.prev_month_button);
+        ImageButton nextButton = findViewById(R.id.next_month_button);
+
+        // Set up month navigation
+        prevButton.setOnClickListener(v -> {
+            currentCalendar.add(Calendar.MONTH, -1);
+            updateCalendar();
+        });
+
+        nextButton.setOnClickListener(v -> {
+            currentCalendar.add(Calendar.MONTH, 1);
+            updateCalendar();
+        });
+
+        // Set up calendar adapter
+        adapter = new CalendarAdapter(context);
+        calendarGrid.setAdapter(adapter);
+
+        // Set date click listener
+        calendarGrid.setOnItemClickListener((parent, view, position, id) -> {
+            CalendarDate date = adapter.getItem(position);
+            if (date.getMonth() == currentCalendar.get(Calendar.MONTH)) {
+                String dateKey = getDateKey(date.getYear(), date.getMonth(), date.getDay());
+                if (dateSelectedListener != null) {
+                    dateSelectedListener.onDateSelected(date.getYear(), date.getMonth(), date.getDay(),
+                            moodEntries.get(dateKey));
                 }
             }
         });
+
+        // Initialize with current month
+        updateCalendar();
     }
 
-    @Override
-    public void setOnDateClickListener(OnDateClickListener listener) {
-        // Store the listener for use in our custom click handling
-        this.dateClickListener = listener;
+    private void updateCalendar() {
+        // Update month/year display
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+        monthYearText.setText(dateFormat.format(currentCalendar.getTime()));
+
+        // Update grid
+        adapter.updateCalendar(currentCalendar, moodEntries);
     }
 
-    // Store mood data for a specific date
-    public void setMoodForDate(long dateTimeMillis, String moodId) {
-        moodData.put(dateTimeMillis, moodId);
-        invalidate(); // Trigger redraw
+    public void setMoodEntry(int year, int month, int day, int moodResId, String notes) {
+        String dateKey = getDateKey(year, month, day);
+        MoodEntry entry = new MoodEntry(moodResId, notes);
+        moodEntries.put(dateKey, entry);
+        updateCalendar();
     }
 
-    // Get mood drawable resource based on mood ID
-    private int getMoodDrawableResource(String moodId) {
-        try {
-            int moodValue = Integer.parseInt(moodId);
-            switch (moodValue) {
-                case 1: return R.drawable.mood_very_sad;
-                case 2: return R.drawable.mood_sad;
-                case 3: return R.drawable.mood_neutral;
-                case 4: return R.drawable.mood_happy;
-                case 5: return R.drawable.mood_very_happy;
-                default: return R.drawable.mood_neutral;
+    public MoodEntry getMoodEntry(int year, int month, int day) {
+        return moodEntries.get(getDateKey(year, month, day));
+    }
+
+    private String getDateKey(int year, int month, int day) {
+        return year + "-" + month + "-" + day;
+    }
+
+    public void setOnDateSelectedListener(OnDateSelectedListener listener) {
+        this.dateSelectedListener = listener;
+    }
+
+    // Interface for date selection callback
+    public interface OnDateSelectedListener {
+        void onDateSelected(int year, int month, int day, @Nullable MoodEntry moodEntry);
+    }
+
+    // Model class for mood entries
+    public static class MoodEntry {
+        private final int moodResId;
+        private final String notes;
+
+        public MoodEntry(int moodResId, String notes) {
+            this.moodResId = moodResId;
+            this.notes = notes;
+        }
+
+        public int getMoodResId() {
+            return moodResId;
+        }
+
+        public String getNotes() {
+            return notes;
+        }
+    }
+
+    // Adapter for calendar grid
+    private static class CalendarAdapter extends BaseAdapter {
+        private final Context context;
+        private final List<CalendarDate> cells = new ArrayList<>();
+        private final LayoutInflater inflater;
+
+        public CalendarAdapter(Context context) {
+            this.context = context;
+            this.inflater = LayoutInflater.from(context);
+        }
+
+        public void updateCalendar(Calendar calendar, Map<String, MoodEntry> moodEntries) {
+            cells.clear();
+
+            // Get start of month
+            Calendar monthCalendar = (Calendar) calendar.clone();
+            monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+
+            int firstDayOfMonth = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+
+            // Fill cells
+            monthCalendar.add(Calendar.DAY_OF_MONTH, -firstDayOfMonth);
+
+            // Fill grid with days
+            while (cells.size() < 42) {
+                int day = monthCalendar.get(Calendar.DAY_OF_MONTH);
+                int month = monthCalendar.get(Calendar.MONTH);
+                int year = monthCalendar.get(Calendar.YEAR);
+
+                // Check if this date has a mood entry
+                String dateKey = year + "-" + month + "-" + day;
+                MoodEntry entry = moodEntries.get(dateKey);
+
+                cells.add(new CalendarDate(day, month, year, entry != null ? entry.getMoodResId() : 0));
+
+                monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
             }
-        } catch (NumberFormatException e) {
-            return R.drawable.mood_neutral;
-        }
-    }
 
-    // Override cell drawing to show mood icons
-    @Override
-    protected void onDrawCell(Canvas canvas, RectF rect, int day, boolean isToday,
-                              boolean isSelected, boolean isOutOfMonth) {
-        // Draw cell background
-        Paint cellPaint = new Paint();
-        cellPaint.setColor(isOutOfMonth ? Color.LTGRAY : Color.WHITE);
-        canvas.drawRect(rect, cellPaint);
-
-        // Draw today's indicator
-        if (isToday) {
-            Paint todayPaint = new Paint();
-            todayPaint.setColor(Color.BLUE);
-            todayPaint.setStyle(Paint.Style.STROKE);
-            todayPaint.setStrokeWidth(4);
-            canvas.drawRect(rect, todayPaint);
+            notifyDataSetChanged();
         }
 
-        // Draw selected date indicator
-        if (isSelected) {
-            Paint selectedPaint = new Paint();
-            selectedPaint.setColor(Color.GREEN);
-            selectedPaint.setStyle(Paint.Style.STROKE);
-            selectedPaint.setStrokeWidth(4);
-            canvas.drawRect(rect, selectedPaint);
+        @Override
+        public int getCount() {
+            return cells.size();
         }
 
-        // Create calendar for this cell's date
-        java.util.Calendar cellCalendar = java.util.Calendar.getInstance();
-        cellCalendar.set(java.util.Calendar.DAY_OF_MONTH, day);
-        // Note: In a complete implementation, you'd set the correct month and year too
+        @Override
+        public CalendarDate getItem(int position) {
+            return cells.get(position);
+        }
 
-        // Check if we have mood data for this date
-        long dateMillis = cellCalendar.getTimeInMillis();
-        String moodId = moodData.get(dateMillis);
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
 
-        if (moodId != null) {
-            // Draw mood icon
-            try {
-                Drawable moodIcon = ContextCompat.getDrawable(context, getMoodDrawableResource(moodId));
-                if (moodIcon != null) {
-                    // Set bounds for the drawable
-                    int padding = 8;
-                    moodIcon.setBounds(
-                            (int) rect.left + padding,
-                            (int) rect.top + padding,
-                            (int) rect.right - padding,
-                            (int) rect.bottom - padding);
-                    moodIcon.draw(canvas);
-                }
-            } catch (Exception e) {
-                // Fallback to drawing the day number
-                drawDayNumber(canvas, rect, day, isOutOfMonth);
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View cellView = convertView;
+            if (cellView == null) {
+                cellView = inflater.inflate(R.layout.day_cell_layout, parent, false);
             }
-        } else {
-            // Draw the day number if no mood icon
-            drawDayNumber(canvas, rect, day, isOutOfMonth);
+
+            // Get day information
+            CalendarDate date = getItem(position);
+
+            // Update views
+            TextView dayText = cellView.findViewById(R.id.day_text);
+            ImageView moodIcon = cellView.findViewById(R.id.mood_icon);
+
+            // Set text
+            dayText.setText(String.valueOf(date.getDay()));
+
+            // Show mood icon if available
+            if (date.getMoodResId() != 0) {
+                moodIcon.setVisibility(View.VISIBLE);
+                moodIcon.setImageResource(date.getMoodResId());
+            } else {
+                moodIcon.setVisibility(View.GONE);
+            }
+
+            return cellView;
         }
     }
 
-    // Helper method to draw the day number
-    private void drawDayNumber(Canvas canvas, RectF rect, int day, boolean isOutOfMonth) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(isOutOfMonth ? Color.GRAY : Color.BLACK);
-        textPaint.setTextSize(24);
-        textPaint.setTextAlign(Paint.Align.CENTER);
+    // Data class for calendar dates
+    private static class CalendarDate {
+        private final int day;
+        private final int month;
+        private final int year;
+        private final int moodResId;
 
-        float textX = rect.centerX();
-        float textY = rect.centerY() + (textPaint.getTextSize() / 3);
-        canvas.drawText(String.valueOf(day), textX, textY, textPaint);
+        public CalendarDate(int day, int month, int year, int moodResId) {
+            this.day = day;
+            this.month = month;
+            this.year = year;
+            this.moodResId = moodResId;
+        }
+
+        public int getDay() {
+            return day;
+        }
+
+        public int getMonth() {
+            return month;
+        }
+
+        public int getYear() {
+            return year;
+        }
+
+        public int getMoodResId() {
+            return moodResId;
+        }
     }
 }

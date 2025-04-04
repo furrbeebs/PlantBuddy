@@ -63,11 +63,13 @@ public abstract class CustomCalendarView extends CalendarView {
     private OnDateSelectedListener onDateSelectedListener;
 
 
+    /*
     private MoodCalendarView.OnDateClickListener onDateClickListener;
 
     public void setOnDateClickListener(MoodCalendarView.OnDateClickListener listener) {
         this.onDateClickListener = listener;
     }
+    /
 
     // Trigger listener when a date is selected
     @Override
@@ -86,8 +88,10 @@ public abstract class CustomCalendarView extends CalendarView {
                     listener.onSelectedDayChange(view, year, month, dayOfMonth);
                 }
             }
+
+
         });
     }
-
+*/
 }
 

@@ -9,210 +9,208 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.app0.R;
 import com.example.app0.moodtracker.MoodCalendarView;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class MoodFragment extends Fragment {
-    private MoodCalendarView calendarView;
+
+    private MoodCalendarView moodCalendar;
     private LinearLayout moodDetailsContainer;
     private TextView selectedDateText;
     private ImageView selectedMoodImage;
     private TextView moodNotesText;
 
-    // for dialog (mood - daily notes)
-    private View moodInputDialog;
+    // Dialog views
+    private View moodDialog;
+    private ImageView closeMoodDialog;
+    private ImageView moodVerySad, moodSad, moodNeutral, moodHappy, moodVeryHappy;
     private EditText notesInput;
-    private ImageView closeDialogButton;
-    private Button doneButton;
-    private ImageView[] moodIcons = new ImageView[5];
+    private Button saveButton;
 
-    private int selectedMoodValue = 3; // Default to neutral
-    private Date currentSelectedDate;
+    // Currently selected date
+    private int selectedYear, selectedMonth, selectedDay;
+    private int selectedMoodResId;
+    private int selectedMoodValue; // 1-7 corresponding to the mood values
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the fragment layout
-        View view = inflater.inflate(R.layout.fragment_mood, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_mood, container, false);
 
-        // Initialize UI components
-        calendarView = view.findViewById(R.id.mood_calendar);
-        moodDetailsContainer = view.findViewById(R.id.mood_details_container);
-        selectedDateText = view.findViewById(R.id.selected_date);
-        selectedMoodImage = view.findViewById(R.id.selected_mood);
-        moodNotesText = view.findViewById(R.id.mood_notes);
+        // Initialize views
+        moodCalendar = rootView.findViewById(R.id.mood_calendar);
+        moodDetailsContainer = rootView.findViewById(R.id.mood_details_container);
+        selectedDateText = rootView.findViewById(R.id.selected_date);
+        selectedMoodImage = rootView.findViewById(R.id.selected_mood);
+        moodNotesText = rootView.findViewById(R.id.mood_notes);
 
-        // Inflate the dialog layout and add it to the main layout
-        moodInputDialog = inflater.inflate(R.layout.dialog_mood_input, null);
+        // Create and add mood dialog
+        moodDialog = inflater.inflate(R.layout.mood_dialog, container, false);
+        ((ViewGroup) rootView).addView(moodDialog);
+        moodDialog.setVisibility(View.GONE);
 
-        // Add the dialog to the root layout with proper layout params
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        // Initialize dialog views
+        closeMoodDialog = moodDialog.findViewById(R.id.close_dialog);
+        moodVerySad = moodDialog.findViewById(R.id.mood_very_sad);
+        moodSad = moodDialog.findViewById(R.id.mood_sad);
+        moodNeutral = moodDialog.findViewById(R.id.mood_neutral);
+        moodHappy = moodDialog.findViewById(R.id.mood_happy);
+        moodVeryHappy = moodDialog.findViewById(R.id.mood_very_happy);
+        notesInput = moodDialog.findViewById(R.id.notes_input);
+        saveButton = moodDialog.findViewById(R.id.done_button);
 
-        // Position it below the calendar
-        params.addRule(RelativeLayout.BELOW, R.id.mood_calendar);
+        // Set up the calendar date selection listener
+        moodCalendar.setOnDateSelectedListener((year, month, day, moodEntry) -> {
+            selectedYear = year;
+            selectedMonth = month;
+            selectedDay = day;
 
-        // Create a RelativeLayout as the container for the fragment content
-        RelativeLayout rootLayout = new RelativeLayout(getContext());
-        rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        // Add the existing view content to the RelativeLayout
-        ((ViewGroup) view).removeView(view.findViewById(R.id.mood_fragment_root_layout));
-        rootLayout.addView(view.findViewById(R.id.mood_fragment_root_layout));
-
-        // Add the dialog to the RelativeLayout
-        rootLayout.addView(moodInputDialog, params);
-
-        // Initially hide the dialog
-        moodInputDialog.setVisibility(View.GONE);
-
-        // Initialize dialog components
-        notesInput = moodInputDialog.findViewById(R.id.notes_input);
-        closeDialogButton = moodInputDialog.findViewById(R.id.close_dialog);
-        doneButton = moodInputDialog.findViewById(R.id.done_button);
-
-        // Initialize mood icons
-        moodIcons[0] = moodInputDialog.findViewById(R.id.mood_very_sad);
-        moodIcons[1] = moodInputDialog.findViewById(R.id.mood_sad);
-        moodIcons[2] = moodInputDialog.findViewById(R.id.mood_neutral);
-        moodIcons[3] = moodInputDialog.findViewById(R.id.mood_happy);
-        moodIcons[4] = moodInputDialog.findViewById(R.id.mood_very_happy);
-
-        // Set up click listeners for mood icons
-        for (int i = 0; i < moodIcons.length; i++) {
-            final int moodValue = i + 1;
-            moodIcons[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    selectMood(moodValue);
-                }
-            });
-        }
-
-        // Set up close button click listener
-        closeDialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideMoodInputDialog();
-            }
-        });
-
-        // Set up done button click listener
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveMoodAndNotes();
-            }
-        });
-
-        // Set up date click listener to show mood input dialog
-        calendarView.setOnDateClickListener(new MoodCalendarView.OnDateClickListener() {
-            @Override
-            public void onDateClick(View view, Date date) {
-                // Save the selected date
-                currentSelectedDate = date;
-
-                // Format date for display
-                SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
-                String dateString = sdf.format(date);
-                selectedDateText.setText(dateString);
-
-                // Show mood input dialog
-                showMoodInputDialog(date);
-            }
-        });
-
-        return rootLayout; // Return the new root layout
-    }
-
-    // Method to show the mood input dialog
-    private void showMoodInputDialog(Date date) {
-        // Reset the dialog state
-        notesInput.setText("");
-        selectMood(3); // Default to neutral mood
-
-        // Make sure the dialog is visible
-        moodInputDialog.setVisibility(View.VISIBLE);
-        moodInputDialog.bringToFront();  // Bring it to the front
-
-        // Ensure the layout is redrawn properly
-        moodInputDialog.requestLayout();
-        moodInputDialog.invalidate();
-    }
-
-    // Method to hide the mood input dialog
-    private void hideMoodInputDialog() {
-        moodInputDialog.setVisibility(View.GONE);
-    }
-
-    // Method to select a mood in the dialog
-    private void selectMood(int moodValue) {
-        // Update selected mood
-        selectedMoodValue = moodValue;
-
-        // Update UI to highlight selected mood
-        for (int i = 0; i < moodIcons.length; i++) {
-            if (i == moodValue - 1) {
-                // Selected mood - add a selection indicator
-                moodIcons[i].setBackgroundResource(R.drawable.mood_selected_background);
+            // Show mood details if exists
+            if (moodEntry != null) {
+                showMoodDetails(year, month, day, moodEntry);
             } else {
-                // Unselected moods
-                moodIcons[i].setBackground(null);
+                // Show dialog to create new mood entry
+                showMoodDialog(year, month, day);
             }
-        }
+        });
+
+        // Set up mood selection in dialog
+        setupMoodSelectionListeners();
+
+        // Set up close dialog button
+        closeMoodDialog.setOnClickListener(v -> {
+            moodDialog.setVisibility(View.GONE);
+        });
+
+        // Set up save button
+        saveButton.setOnClickListener(v -> {
+            saveMoodEntry();
+        });
+
+        return rootView;
     }
 
-    // Method to save mood and notes
-    private void saveMoodAndNotes() {
-        // Get notes from input field
-        String notes = notesInput.getText().toString();
+    private void setupMoodSelectionListeners() {
+        // Clear previous selection when selecting a new mood
+        View.OnClickListener moodClickListener = v -> {
+            resetMoodSelection();
+            v.setSelected(true);
 
-        // Update mood display
-        selectedMoodImage.setImageResource(getMoodDrawableResource(selectedMoodValue));
+            // Set the selected mood resource id and value
+            if (v.getId() == R.id.mood_very_sad) {
+                selectedMoodResId = R.drawable.mood_very_sad;
+                selectedMoodValue = 1;
+            } else if (v.getId() == R.id.mood_sad) {
+                selectedMoodResId = R.drawable.mood_sad;
+                selectedMoodValue = 2;
+            } else if (v.getId() == R.id.mood_neutral) {
+                selectedMoodResId = R.drawable.mood_neutral;
+                selectedMoodValue = 3;
+            } else if (v.getId() == R.id.mood_happy) {
+                selectedMoodResId = R.drawable.mood_happy;
+                selectedMoodValue = 4;
+            } else if (v.getId() == R.id.mood_very_happy) {
+                selectedMoodResId = R.drawable.mood_very_happy;
+                selectedMoodValue = 6; // Note this matches the image index
+            }
+        };
 
-        // Update notes display
-        moodNotesText.setText(notes);
+        // Apply the listener to all mood icons
+        moodVerySad.setOnClickListener(moodClickListener);
+        moodSad.setOnClickListener(moodClickListener);
+        moodNeutral.setOnClickListener(moodClickListener);
+        moodHappy.setOnClickListener(moodClickListener);
+        moodVeryHappy.setOnClickListener(moodClickListener);
+    }
 
-        // Show the details container
+    private void resetMoodSelection() {
+        moodVerySad.setSelected(false);
+        moodSad.setSelected(false);
+        moodNeutral.setSelected(false);
+        moodHappy.setSelected(false);
+        moodVeryHappy.setSelected(false);
+        selectedMoodResId = 0;
+        selectedMoodValue = 0;
+    }
+
+    private void showMoodDialog(int year, int month, int day) {
+        // Reset dialog state
+        resetMoodSelection();
+        notesInput.setText("");
+
+        // Format and display the date
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(calendar.getTime());
+
+        // Hide details and show dialog
+        moodDetailsContainer.setVisibility(View.GONE);
+        moodDialog.setVisibility(View.VISIBLE);
+    }
+
+    private void showMoodDetails(int year, int month, int day, MoodCalendarView.MoodEntry moodEntry) {
+        // Format and display the date
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(calendar.getTime());
+        selectedDateText.setText(formattedDate);
+
+        // Display mood and notes
+        selectedMoodImage.setImageResource(moodEntry.getMoodResId());
+        moodNotesText.setText(moodEntry.getNotes());
+
+        // Hide dialog and show details
+        moodDialog.setVisibility(View.GONE);
         moodDetailsContainer.setVisibility(View.VISIBLE);
-
-        // Hide the dialog
-        hideMoodInputDialog();
-
-        // Update the calendar view with the new mood
-        try {
-            // Convert Date to long timestamp (milliseconds since epoch)
-            long dateTimeMillis = currentSelectedDate.getTime();
-
-            // Convert the integer mood value to a String
-            String moodId = String.valueOf(selectedMoodValue);
-
-            // Pass the string ID to the calendar view
-            calendarView.setMoodForDate(dateTimeMillis, moodId);
-        } catch (Exception e) {
-            // If the method doesn't exist yet, this will catch the error
-        }
     }
 
-    // Utility method to get the drawable resource for a mood value
-    private int getMoodDrawableResource(int moodValue) {
-        switch (moodValue) {
-            case 1: return R.drawable.mood_very_sad;
-            case 2: return R.drawable.mood_sad;
-            case 3: return R.drawable.mood_neutral;
-            case 4: return R.drawable.mood_happy;
-            case 5: return R.drawable.mood_very_happy;
-            default: return R.drawable.mood_neutral;
+    private void saveMoodEntry() {
+        if (selectedMoodValue == 0) {
+            // No mood selected, show error or select default
+            selectedMoodValue = 3; // Default to neutral if none selected
+            selectedMoodResId = R.drawable.mood_neutral;
         }
+
+        String notes = notesInput.getText().toString().trim();
+
+        // Save mood to calendar
+        moodCalendar.setMoodEntry(selectedYear, selectedMonth, selectedDay, selectedMoodResId, notes);
+
+        // Also save the mood value for the adapter's coloring
+        saveMoodValueToStorage(selectedYear, selectedMonth, selectedDay, selectedMoodValue);
+
+        // Close dialog and show details
+        moodDialog.setVisibility(View.GONE);
+
+        // Get the saved entry and show details
+        MoodCalendarView.MoodEntry entry = moodCalendar.getMoodEntry(selectedYear, selectedMonth, selectedDay);
+        showMoodDetails(selectedYear, selectedMonth, selectedDay, entry);
+    }
+
+    // This method would save the mood value to your data storage (SharedPreferences or Database)
+    private void saveMoodValueToStorage(int year, int month, int day, int moodValue) {
+        // Implementation depends on your storage mechanism
+        // For example, using SharedPreferences:
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month, day, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long dateMillis = cal.getTimeInMillis();
+
+        //  a placeholder - implement according to storage method
+        // example:
+        // SharedPreferences prefs = requireContext().getSharedPreferences("MoodPrefs", Context.MODE_PRIVATE);
+        // prefs.edit().putInt("mood_" + dateMillis, moodValue).apply();
     }
 }
