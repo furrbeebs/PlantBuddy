@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="teal">#5EB1A2</color>
 
     <!-- Mood background colors based on the provided image -->
     <color name="mood_very_sad_bg">#7F7F7F</color>        <!-- Dark gray -->
