@@ -16,9 +16,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            loadFragment(new JournalFragment());
-
-            /*
             // Create MoodFragment instance
             MoodFragment moodFragment = new MoodFragment();
 
@@ -31,20 +28,8 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.mood_fragment_container, moodFragment);
             transaction.commit();
-
-             */
         }
     }
 
-    // Method to load a fragment
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.journal_fragment_container, fragment);
-        transaction.commit();
-    }
 
-    // If you have navigation buttons or menu options to switch between fragments
-    public void openJournalChatbot() {
-        loadFragment(new JournalFragment());
-    }
 }
