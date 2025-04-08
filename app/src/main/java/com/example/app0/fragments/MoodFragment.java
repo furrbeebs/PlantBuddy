@@ -208,7 +208,7 @@ public class MoodFragment extends Fragment {
         cal.set(Calendar.MILLISECOND, 0);
         long dateMillis = cal.getTimeInMillis();
 
-        //  a placeholder - implement according to storage method
+        // a placeholder - implement according to storage method
         // example:
         // SharedPreferences prefs = requireContext().getSharedPreferences("MoodPrefs", Context.MODE_PRIVATE);
         // prefs.edit().putInt("mood_" + dateMillis, moodValue).apply();

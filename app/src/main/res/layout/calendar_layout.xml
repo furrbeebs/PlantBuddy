@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+<!-- for mood -->
+
     <!-- Header with month navigation -->
     <RelativeLayout
         android:layout_width="match_parent"

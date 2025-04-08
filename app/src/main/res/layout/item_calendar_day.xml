@@ -5,6 +5,8 @@
     android:layout_height="48dp"
     android:padding="2dp">
 
+<!-- when date is selected, mood dialog covers calendar -->
+
     <ImageView
         android:id="@+id/mood_icon"
         android:layout_width="32dp"

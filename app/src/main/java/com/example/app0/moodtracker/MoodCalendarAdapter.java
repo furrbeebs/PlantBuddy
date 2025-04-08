@@ -105,7 +105,7 @@ public class MoodCalendarAdapter extends BaseAdapter {
             dayText.setAlpha(1.0f);
 
             if (moodId != null) {
-                // We have mood data - apply the appropriate mood style
+                // We have mood data - apply appropriate mood style
                 try {
                     int moodValue = Integer.parseInt(moodId);
 
@@ -114,15 +114,15 @@ public class MoodCalendarAdapter extends BaseAdapter {
                     moodIcon.setBackgroundResource(R.drawable.mood_background_filled);
                     moodIcon.setBackgroundTintList(ContextCompat.getColorStateList(context, colorId));
 
-                    // Set the face icon
+                    // Set the emoji
                     moodIcon.setImageResource(getMoodFaceResource(moodValue));
                 } catch (NumberFormatException e) {
-                    // If mood value is invalid, show empty circle
+                    // If mood value is invalid, show empty
                     moodIcon.setBackgroundResource(R.drawable.mood_background_empty);
                     moodIcon.setImageResource(0);
                 }
             } else {
-                // No mood for this date - show empty circle
+                // No mood for this date - show empty
                 moodIcon.setBackgroundResource(R.drawable.mood_background_empty);
                 moodIcon.setImageResource(0);
             }
@@ -144,7 +144,7 @@ public class MoodCalendarAdapter extends BaseAdapter {
         return convertView;
     }
 
-    // Helper method to get milliseconds for day (zeroing out hours/minutes/seconds)
+    // Helper method to get milliseconds for day (hours/minutes/seconds)
     private long getDayMillis(Calendar calendar) {
         Calendar dayCal = (Calendar) calendar.clone();
         dayCal.set(Calendar.HOUR_OF_DAY, 0);

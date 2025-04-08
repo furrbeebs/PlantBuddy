@@ -7,6 +7,7 @@
     android:background="#F5F5F5"
     tools:context=".MainActivity">
 
+<!-- call mood fragment -->
     <FrameLayout
         android:id="@+id/mood_fragment_container"
         android:layout_width="match_parent"

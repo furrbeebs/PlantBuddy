@@ -5,6 +5,8 @@
     android:layout_height="40dp"
     android:padding="2dp">
 
+<!--    for text above calendar when date is not selected -->
+
     <TextView
         android:id="@+id/day_text"
         android:layout_width="wrap_content"

@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             bundle.putString("selectedDate", "2025-04-03"); // Example of passing selected date
             moodFragment.setArguments(bundle);
 
-            // Add the fragment to the container
+            // Add the mood fragment to the container
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.mood_fragment_container, moodFragment);
             transaction.commit();

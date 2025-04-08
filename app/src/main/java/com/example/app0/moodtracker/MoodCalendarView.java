@@ -84,7 +84,6 @@ public class MoodCalendarView extends LinearLayout {
                 }
             }
         });
-
         // Initialize with current month
         updateCalendar();
     }
