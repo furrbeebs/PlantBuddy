@@ -121,7 +121,7 @@ public class MoodFragment extends Fragment {
                 selectedMoodValue = 4;
             } else if (v.getId() == R.id.mood_very_happy) {
                 selectedMoodResId = R.drawable.mood_very_happy;
-                selectedMoodValue = 6; // Note this matches the image index
+                selectedMoodValue = 6;
             }
         };
 
@@ -199,10 +199,10 @@ public class MoodFragment extends Fragment {
         showMoodDetails(selectedYear, selectedMonth, selectedDay, entry);
     }
 
-    // This method would save the mood value to your data storage (SharedPreferences or Database)
+    // This method would save the mood value to data storage (Database)
     private void saveMoodValueToStorage(int year, int month, int day, int moodValue) {
         // Implementation depends on your storage mechanism
-        // For example, using SharedPreferences:
+        // e.g., using SharedPreferences:
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);

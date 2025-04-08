@@ -28,7 +28,7 @@ public class MoodCalendarAdapter extends BaseAdapter {
     // Number of days to display (7 days * 6 weeks)
     private static final int DAYS_COUNT = 42;
 
-    // Mapping for mood colors based on the image
+    // Mapping for mood colors
     private static final int[] MOOD_BACKGROUND_COLORS = {
             R.color.mood_neutral_bg,  // Default/placeholder
             R.color.mood_very_sad_bg,    // 1: Very sad - dark gray
