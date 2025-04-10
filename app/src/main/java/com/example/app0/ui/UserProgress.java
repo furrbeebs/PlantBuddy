@@ -14,12 +14,11 @@ public class UserProgress extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.user_progress);
 
         // Setup click listeners for bottom navigation
         setupBottomNavigation();
     }
-
     private void setupBottomNavigation() {
         LinearLayout goalsTab = findViewById(R.id.goalsTab);
         LinearLayout journalTab = findViewById(R.id.journalTab);
