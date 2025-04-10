@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    mood layout -->
+<!--    mood layout for mood tracking screen -->
 
     <!-- Toolbar with Back Button and Month Dropdown -->
     <androidx.appcompat.widget.Toolbar
