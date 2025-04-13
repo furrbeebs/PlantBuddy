@@ -2,6 +2,7 @@ package com.example.app0.moodtracker;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.example.app0.R;
+import com.example.app0.data.Local.Entity.CalendarItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,12 +30,12 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MoodCalendarView extends LinearLayout {
-
     private TextView monthYearText;
     private GridView calendarGrid;
     private CalendarAdapter adapter;
     private Calendar currentCalendar = Calendar.getInstance();
     private OnDateSelectedListener dateSelectedListener;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     // Map to store mood data: date string -> MoodEntry
     private Map<String, MoodEntry> moodEntries = new HashMap<>();
@@ -78,12 +79,18 @@ public class MoodCalendarView extends LinearLayout {
             CalendarDate date = adapter.getItem(position);
             if (date.getMonth() == currentCalendar.get(Calendar.MONTH)) {
                 String dateKey = getDateKey(date.getYear(), date.getMonth(), date.getDay());
+
                 if (dateSelectedListener != null) {
-                    dateSelectedListener.onDateSelected(date.getYear(), date.getMonth(), date.getDay(),
-                            moodEntries.get(dateKey));
+                    dateSelectedListener.onDateSelected(
+                            date.getYear(),
+                            date.getMonth(), // This remains 0-based for Calendar
+                            date.getDay(),
+                            moodEntries.get(dateKey)
+                    );
                 }
             }
         });
+
         // Initialize with current month
         updateCalendar();
     }
@@ -99,17 +106,13 @@ public class MoodCalendarView extends LinearLayout {
 
     public void setMoodEntry(int year, int month, int day, int moodResId, String notes) {
         String dateKey = getDateKey(year, month, day);
-        MoodEntry entry = new MoodEntry(moodResId, notes);
+        MoodEntry entry = new MoodEntry(dateKey, moodResId, notes);
         moodEntries.put(dateKey, entry);
         updateCalendar();
     }
 
     public MoodEntry getMoodEntry(int year, int month, int day) {
         return moodEntries.get(getDateKey(year, month, day));
-    }
-
-    private String getDateKey(int year, int month, int day) {
-        return year + "-" + month + "-" + day;
     }
 
     public void setOnDateSelectedListener(OnDateSelectedListener listener) {
@@ -121,14 +124,20 @@ public class MoodCalendarView extends LinearLayout {
         void onDateSelected(int year, int month, int day, @Nullable MoodEntry moodEntry);
     }
 
-    // Model class for mood entries
+    // Class for mood entries
     public static class MoodEntry {
+        private String date; // Format: "yyyy-MM-dd"
         private final int moodResId;
         private final String notes;
 
-        public MoodEntry(int moodResId, String notes) {
+        public MoodEntry(String date, int moodResId, String notes) {
+            this.date = date;
             this.moodResId = moodResId;
             this.notes = notes;
+        }
+
+        public String getDate() {
+            return date;
         }
 
         public int getMoodResId() {
@@ -138,6 +147,41 @@ public class MoodCalendarView extends LinearLayout {
         public String getNotes() {
             return notes;
         }
+    }
+    public void removeMoodEntry(int year, int month, int day) {
+        String dateKey = getDateKey(year, month, day);
+        moodEntries.remove(dateKey);
+        updateCalendar();
+    }
+    // Helper method to create consistent date keys
+    private String getDateKey(int year, int month, int day) {
+        return String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day);
+    }
+
+
+
+    public void updateWithCalendarItems(List<CalendarItem> items) {
+        moodEntries.clear();
+        if (items != null) {
+            for (CalendarItem item : items) {
+                Date date = item.getDate();
+                if (date != null) {
+                    try {
+                        String dateKey = DATE_FORMAT.format(date);
+                        moodEntries.put(dateKey, new MoodEntry(
+                                dateKey,
+                                item.getMood().getIconResId(),
+                                item.getEntry())
+                        );
+                    } catch (Exception e) {
+                        Log.e("MoodCalendarView", "Error processing calendar item", e);
+                    }
+                } else {
+                    Log.w("MoodCalendarView", "Encountered CalendarItem with null date");
+                }
+            }
+        }
+        updateCalendar();
     }
 
     // Adapter for calendar grid
@@ -151,13 +195,13 @@ public class MoodCalendarView extends LinearLayout {
             this.inflater = LayoutInflater.from(context);
         }
 
+
         public void updateCalendar(Calendar calendar, Map<String, MoodEntry> moodEntries) {
             cells.clear();
 
             // Get start of month
             Calendar monthCalendar = (Calendar) calendar.clone();
             monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-
             int firstDayOfMonth = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
 
             // Fill cells
@@ -169,12 +213,11 @@ public class MoodCalendarView extends LinearLayout {
                 int month = monthCalendar.get(Calendar.MONTH);
                 int year = monthCalendar.get(Calendar.YEAR);
 
-                // Check if this date has a mood entry
-                String dateKey = year + "-" + month + "-" + day;
+                // Format date key
+                String dateKey = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day);
                 MoodEntry entry = moodEntries.get(dateKey);
 
                 cells.add(new CalendarDate(day, month, year, entry != null ? entry.getMoodResId() : 0));
-
                 monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
             }
 
