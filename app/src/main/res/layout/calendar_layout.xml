@@ -53,7 +53,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:paddingStart="1dp"
+        android:paddingEnd="1dp">
+
 
         <TextView
             android:layout_width="0dp"
@@ -61,7 +64,10 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="S"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
+
 
         <TextView
             android:layout_width="0dp"
@@ -69,7 +75,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="M"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -77,7 +85,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="T"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -85,7 +95,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="W"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -93,7 +105,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="T"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -101,7 +115,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="F"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -109,7 +125,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="S"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingStart="1dp"
+            android:paddingEnd="1dp"/>
     </LinearLayout>
 
     <!-- Calendar grid -->
@@ -120,6 +138,8 @@
         android:numColumns="7"
         android:stretchMode="columnWidth"
         android:verticalSpacing="4dp"
-        android:horizontalSpacing="4dp" />
+        android:horizontalSpacing="5dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="3dp"/>
 
 </LinearLayout>

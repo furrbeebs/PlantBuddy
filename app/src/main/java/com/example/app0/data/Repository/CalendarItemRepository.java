@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.app0.data.Local.Entity.CalendarItem;
 import com.example.app0.data.Local.DAO.CalendarItemDao;
-import com.example.app0.data.Local.Database.CalendarItemDatabase;
+import com.example.app0.data.Local.Database.AppDatabase;
 import com.example.app0.models.Mood;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +29,7 @@ public class CalendarItemRepository {
 
     public CalendarItemRepository(Application application) {
         // Initialize the Room database instance (singleton pattern)
-        CalendarItemDatabase database = CalendarItemDatabase.getInstance(application);
+        AppDatabase database = AppDatabase.getDatabase(application);
         // Call database method by using dao
         calendarItemDao = database.getCalendarItemDao();
         // Use DAO to get all data, Live automatically updates the app when there are changes

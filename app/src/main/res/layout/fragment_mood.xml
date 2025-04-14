@@ -17,11 +17,12 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <!-- Back Button -->
-        <ImageView
+        <ImageButton
             android:id="@+id/back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:padding="12dp"
+            android:background="@color/teal"
             android:src="@drawable/ic_back"
             android:contentDescription="Back"
             android:layout_gravity="start|center_vertical" />

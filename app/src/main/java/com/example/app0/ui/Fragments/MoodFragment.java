@@ -1,5 +1,6 @@
 package com.example.app0.ui.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.app0.MainActivity;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.CalendarItem;
 import com.example.app0.data.Repository.CalendarItemRepository;
@@ -52,6 +55,9 @@ public class MoodFragment extends Fragment {
     // Edit and Delete buttons
     private Button updateButton;
     private Button deleteButton;
+
+    // Back Button to Home Page
+    private ImageButton backButton;
 
     // Currently selected date
     private int selectedYear, selectedMonth, selectedDay;
@@ -89,12 +95,22 @@ public class MoodFragment extends Fragment {
         notesInput = moodDialog.findViewById(R.id.notes_input);
         saveButton = moodDialog.findViewById(R.id.done_button);
 
+
         // Create and add the update and delete buttons
         LinearLayout buttonLayout = new LinearLayout(requireContext());
         buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        // Create backButton
+        backButton = rootView.findViewById(R.id.back_button);
+
+        // Set up Back Button
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), MainActivity.class);
+            startActivity(intent);
+        });
 
         // Create Update Button
         updateButton = new Button(requireContext());
