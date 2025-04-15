@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mood_fragment_root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF">
 
-<!--    mood layout -->
+    <!--    mood layout -->
 
     <!-- Toolbar with Back Button and Month Dropdown -->
     <androidx.appcompat.widget.Toolbar

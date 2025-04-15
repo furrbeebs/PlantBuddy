@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.app0.MainActivity;
+import com.example.app0.ProgressPage;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.PlantBuddy;
 import com.example.app0.data.Repository.PlantBuddyRepository;
@@ -74,7 +74,7 @@ public class LoginPage extends AppCompatActivity {
 
                     });
 
-                    Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                    Intent intent = new Intent(LoginPage.this, ProgressPage.class);
                     //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 });
@@ -86,7 +86,7 @@ public class LoginPage extends AppCompatActivity {
                 loginButton.setText("Enter");
                 loginButton.setOnClickListener(v -> {
 
-                    Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                    Intent intent = new Intent(LoginPage.this, ProgressPage.class);
                     //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 });

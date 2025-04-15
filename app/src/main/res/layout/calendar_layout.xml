@@ -135,11 +135,11 @@
         android:id="@+id/calendar_grid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="7"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="4dp"
         android:horizontalSpacing="5dp"
+        android:numColumns="7"
         android:paddingStart="4dp"
-        android:paddingEnd="3dp"/>
+        android:paddingEnd="3dp"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="4dp" />
 
 </LinearLayout>

@@ -2,7 +2,6 @@ package com.example.app0.ui.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.app0.MainActivity;
+import com.example.app0.ProgressPage;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.CalendarItem;
 import com.example.app0.data.Repository.CalendarItemRepository;
@@ -131,7 +130,7 @@ public class MoodFragment extends Fragment {
 
         // Set up Back Button
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(requireActivity(), MainActivity.class);
+            Intent intent = new Intent(requireActivity(), ProgressPage.class);
             startActivity(intent);
         });
 
