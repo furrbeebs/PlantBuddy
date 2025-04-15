@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:src="@drawable/plant_buddy_logo"/>
+
+    <EditText
+        android:id="@+id/usernameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logo"
+        android:visibility="gone"
+        android:hint="Username"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="30dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:background="@drawable/rounded_corner"
+        android:padding="18dp"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/plantnameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/usernameInput"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:hint="Name Your Plant Buddy"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="30dp"
+        android:textColorHint="@android:color/darker_gray"
+        android:background="@drawable/rounded_corner"
+        android:padding="18dp"
+        android:inputType="text"/>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_below="@+id/plantnameInput"
+        android:layout_marginHorizontal="30dp"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:padding="20dp"
+        android:layout_marginTop="32dp"/>
+
+</RelativeLayout>

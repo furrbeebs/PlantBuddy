@@ -2,18 +2,18 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="teal">#FFFFFFFF</color> <!--used for calendar-->
+    <color name="teal">#5EB1A2</color>
+    <color name="red">#FF0000</color>
 
-    <color name="accent_color">#03DAC5</color>
-    <color name="page_background">#81b7a9 </color> <!-- background: "teal" -->
-    <color name="primary_color">#6200EE</color> <!-- Example: Purple -->
-
-    <!-- calendar -->
-    <color name="date_text_color">#000000</color>
-    <color name="week_day_text_color">#FF000000</color>
-
-    <!--light mode-->
-    <color name="backgroundColor">#FCFCFC</color>
-    <color name="textColor">#000000</color>
+    <!-- Mood background colors based on the provided image -->
+    <color name="mood_very_sad_bg">#7F7F7F</color>        <!-- Dark gray -->
+    <color name="mood_sad_bg">#30694B</color>             <!-- Dark green -->
+    <color name="mood_neutral_bg">#50AA50</color>         <!-- Medium green -->
+    <color name="mood_happy_bg">#A8E2A8</color>           <!-- Light green -->
+    <color name="mood_neutral_dark_bg">#555555</color>    <!-- Darker gray -->
+    <color name="mood_very_happy_bg">#FFE25A</color>      <!-- Yellow -->
+    <color name="mood_neutral_light_bg">#CCCCCC</color>   <!-- Light gray -->
+    <color name="mood_selected_border">#2196F3</color>    <!-- Blue -->
+    <color name="mood_today_border">#FF9800</color>       <!-- Orange -->
 
 </resources>

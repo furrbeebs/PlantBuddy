@@ -12,11 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App0"
         tools:targetApi="31">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
 
-            >
+
+        <activity
+            android:name=".ProgressPage"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.Activity.MoodActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.Activity.GoalsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.Activity.LoginPage"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.Activity.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,9 +40,19 @@
             </intent-filter>
         </activity>
 
+        <!--        <activity-->
+        <!--            android:name=".MainActivity"-->
+        <!--            android:exported="true"-->
+        <!--            android:theme="@style/Theme.App0">-->
+
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.intent.action.MAIN" />-->
+        <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+        <!--            </intent-filter>-->
+        <!--        </activity>-->
+
     </application>
 
 </manifest>
 
-<!--android:theme="@style/AppTheme" add after android:exported="true" in activity-->
-<!--comments cannot be inserted within the code in this file, if you want to add comment, add below here-->
+    <!-- Ensure that Theme.App0 exists in themes.xml -->
