@@ -50,6 +50,16 @@ public class MoodCalendarView extends LinearLayout {
         init(context);
     }
 
+    public interface OnMonthChangedListener {
+        void onMonthChanged(int year, int month);
+    }
+
+    private OnMonthChangedListener monthChangedListener;
+
+    public void setOnMonthChangedListener(OnMonthChangedListener listener) {
+        this.monthChangedListener = listener;
+    }
+
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.calendar_layout, this, true);
 
@@ -59,16 +69,39 @@ public class MoodCalendarView extends LinearLayout {
         ImageButton prevButton = findViewById(R.id.prev_month_button);
         ImageButton nextButton = findViewById(R.id.next_month_button);
 
-        // Set up month navigation
+//        // Set up month navigation
+//        prevButton.setOnClickListener(v -> {
+//            currentCalendar.add(Calendar.MONTH, -1);
+//            updateCalendar();
+//        });
+//
+//        nextButton.setOnClickListener(v -> {
+//            currentCalendar.add(Calendar.MONTH, 1);
+//            updateCalendar();
+//        });
         prevButton.setOnClickListener(v -> {
             currentCalendar.add(Calendar.MONTH, -1);
             updateCalendar();
+            if (monthChangedListener != null) {
+                monthChangedListener.onMonthChanged(
+                        currentCalendar.get(Calendar.YEAR),
+                        currentCalendar.get(Calendar.MONTH)
+                );
+            }
         });
 
         nextButton.setOnClickListener(v -> {
             currentCalendar.add(Calendar.MONTH, 1);
             updateCalendar();
+            if (monthChangedListener != null) {
+                monthChangedListener.onMonthChanged(
+                        currentCalendar.get(Calendar.YEAR),
+                        currentCalendar.get(Calendar.MONTH)
+                );
+            }
         });
+
+
 
         // Set up calendar adapter
         adapter = new CalendarAdapter(context);
@@ -95,6 +128,15 @@ public class MoodCalendarView extends LinearLayout {
         updateCalendar();
     }
 
+    public void setDisplayMonth(int year, int month) {
+        // Update the calendar to display the specified month
+        currentCalendar.set(Calendar.YEAR, year);
+        currentCalendar.set(Calendar.MONTH, month);
+        currentCalendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Update calendar display
+        updateCalendar();
+    }
     private void updateCalendar() {
         // Update month/year display
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
@@ -158,6 +200,13 @@ public class MoodCalendarView extends LinearLayout {
         return String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day);
     }
 
+    public int getCurrentYear() {
+        return currentCalendar.get(Calendar.YEAR);
+    }
+
+    public int getCurrentMonth() {
+        return currentCalendar.get(Calendar.MONTH);
+    }
 
 
     public void updateWithCalendarItems(List<CalendarItem> items) {
@@ -267,6 +316,20 @@ public class MoodCalendarView extends LinearLayout {
             return cellView;
         }
     }
+
+//    public void setDisplayMonth(int year, int month) {
+//        // Update the calendar to display the specified month
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(Calendar.YEAR, year);
+//        calendar.set(Calendar.MONTH, month);
+//        calendar.set(Calendar.DAY_OF_MONTH, 1);
+//
+//        // Update your calendar view with the new month
+//        // Implement according to how your MoodCalendarView is structured
+//
+//        invalidate(); // Redraw the view
+//    }
+
 
     // Data class for calendar dates
     private static class CalendarDate {

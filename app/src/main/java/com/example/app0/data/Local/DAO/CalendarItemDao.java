@@ -40,4 +40,7 @@ public interface CalendarItemDao {
     @Query("SELECT * FROM calendarItems WHERE date = :date")
     LiveData<CalendarItem> getCalendarItemByDateLive(String date);
 
+    @Query("SELECT * FROM calendarItems WHERE date >= :startDate AND date <= :endDate")
+    List<CalendarItem> getCalendarItemsForDateRangeSync(Date startDate, Date endDate);
+
 }

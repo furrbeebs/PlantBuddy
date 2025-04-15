@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,10 +66,16 @@ public class MoodFragment extends Fragment {
     // Flag to track if we're editing or creating new
     private boolean isEditMode = false;
 
+    // Calendar Dropdown
+    private TextView monthTextView;
+    private Calendar currentCalendar = Calendar.getInstance();
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_mood, container, false);
+
 
         // Get the ViewModel
         moodViewModel = new ViewModelProvider(this).get(CalendarItemViewModel.class);
@@ -95,6 +102,13 @@ public class MoodFragment extends Fragment {
         notesInput = moodDialog.findViewById(R.id.notes_input);
         saveButton = moodDialog.findViewById(R.id.done_button);
 
+        // Initialize month selector
+        monthTextView = rootView.findViewById(R.id.month_text);
+
+
+        // Set click listener to show month picker
+        monthTextView.setOnClickListener(v -> showMonthYearPicker());
+
 
         // Create and add the update and delete buttons
         LinearLayout buttonLayout = new LinearLayout(requireContext());
@@ -102,6 +116,15 @@ public class MoodFragment extends Fragment {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        // drop down menu
+        updateMonthYearDisplay();
+        // In onCreateView, after initializing moodCalendar
+        moodCalendar.setOnMonthChangedListener((year, month) -> {
+            currentCalendar.set(Calendar.YEAR, year);
+            currentCalendar.set(Calendar.MONTH, month);
+            updateMonthYearDisplay();
+        });
 
         // Create backButton
         backButton = rootView.findViewById(R.id.back_button);
@@ -474,5 +497,74 @@ public class MoodFragment extends Fragment {
             }
         }
     }
+
+    private void showMonthYearPicker() {
+        // Create a custom dialog for month-year picker
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.month_year_picker_dialog, null);
+        builder.setView(dialogView);
+
+        // Get number pickers for month and year
+        final NumberPicker monthPicker = dialogView.findViewById(R.id.month_picker);
+        final NumberPicker yearPicker = dialogView.findViewById(R.id.year_picker);
+
+        // Set up month picker
+        String[] months = new String[]{"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        monthPicker.setMinValue(0);
+        monthPicker.setMaxValue(11);
+        monthPicker.setDisplayedValues(months);
+
+        // Get current values from MoodCalendarView's calendar
+        Calendar calendarViewDate = Calendar.getInstance();
+        calendarViewDate.set(
+                moodCalendar.getCurrentYear(),
+                moodCalendar.getCurrentMonth(),
+                1
+        );
+
+        // Set current values in pickers
+        monthPicker.setValue(calendarViewDate.get(Calendar.MONTH));
+
+        // Set up year picker
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        int minYear = currentYear - 5; // 5 years back
+        int maxYear = currentYear;     // Current year as maximum
+
+        yearPicker.setMinValue(minYear);
+        yearPicker.setMaxValue(maxYear);
+        yearPicker.setValue(Math.min(Math.max(calendarViewDate.get(Calendar.YEAR), minYear), maxYear));
+        yearPicker.setWrapSelectorWheel(false); // Turn off wrapping/cycling behavior for years
+
+        // Set button actions
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            int selectedMonth = monthPicker.getValue();
+            int selectedYear = yearPicker.getValue();
+
+            // Update the calendar to display the selected month
+            moodCalendar.setDisplayMonth(selectedYear, selectedMonth);
+
+            // Update the month text display
+            currentCalendar.set(Calendar.YEAR, selectedYear);
+            currentCalendar.set(Calendar.MONTH, selectedMonth);
+            updateMonthYearDisplay();
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        // Show dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void updateMonthYearDisplay() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+        monthTextView.setText(dateFormat.format(currentCalendar.getTime()));
+    }
+
+
+
+
+
 
 }

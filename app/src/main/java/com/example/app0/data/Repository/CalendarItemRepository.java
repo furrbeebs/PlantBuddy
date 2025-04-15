@@ -90,6 +90,10 @@ public class CalendarItemRepository {
         });
     }
 
+    public List<CalendarItem> getCalendarItemsForDateRangeSync(Date startDate, Date endDate) {
+        return calendarItemDao.getCalendarItemsForDateRangeSync(startDate, endDate);
+    }
+
     public List<CalendarItem> getAllCalendarItemsSync() {
         try {
             // Synchronization aid that allows one thread to wait until other threads complete their tasks

@@ -66,19 +66,23 @@ public class CalendarItemViewModel extends AndroidViewModel {
     }
 
 
-public void deleteCalendarItemByDate(int year, int month, int day) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.set(year, month, day, 0, 0, 0);
-    calendar.set(Calendar.MILLISECOND, 0);
-    Date date = calendar.getTime();
+    public void deleteCalendarItemByDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date date = calendar.getTime();
 
-    if (date != null) {
-        Log.d("ViewModel", "Deleting entry for date: " + date);
-        repository.deleteMoodEntry(date);
-    } else {
-        Log.e("ViewModel", "Cannot delete with null date");
+        if (date != null) {
+            Log.d("ViewModel", "Deleting entry for date: " + date);
+            repository.deleteMoodEntry(date);
+        } else {
+            Log.e("ViewModel", "Cannot delete with null date");
+        }
     }
-}
+
+    public List<CalendarItem> getCalendarItemsForRangeSync(Date startDate, Date endDate) {
+        return repository.getCalendarItemsForDateRangeSync(startDate, endDate);
+    }
 
     public List<CalendarItem> getAllCalendarItemsSync() {
         final List<CalendarItem>[] result = new List[1];

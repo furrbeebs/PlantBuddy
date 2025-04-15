@@ -42,8 +42,9 @@
                 android:id="@+id/month_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="April 2025"
+                android:text="Month"
                 android:textSize="18sp"
+                android:translationX="15dp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />
 
@@ -52,6 +53,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="8dp"
+                android:translationX="8dp"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_dropdown"
                 android:contentDescription="Select Month" />

@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.app0.MainActivity;
-import com.example.app0.ProgressPage;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.PlantBuddy;
 import com.example.app0.data.Repository.PlantBuddyRepository;
