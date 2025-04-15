@@ -5,7 +5,7 @@
     android:layout_height="45dp"
     android:padding="1dp">
 
-<!--    for text above calendar when date is not selected -->
+<!--    shows how individual date cells will appear with the mood icon -->
 
     <ImageView
         android:id="@+id/mood_icon"

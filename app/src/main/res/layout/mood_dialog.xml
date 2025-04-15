@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-<!--    -->
     <!-- add space before the dialog so it doesnt cover calendar (use fixed height) -->
     <View
         android:layout_width="match_parent"

@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface CalendarItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-        // replace same key if there is one
+        // Replace same key if there is one
     void insertCalendarItem(CalendarItem item);
 
     @Update
@@ -25,22 +25,22 @@ public interface CalendarItemDao {
     @Delete
     void deleteCalendarItem(CalendarItem item);
 
+    // Date is like 2004-10-28
     @Query("DELETE FROM calendarItems WHERE date = :date")
     void deleteCalendarItemByDate(Date date);
 
+    // Used for initial loading of data
     @Query("SELECT * FROM calendarItems")
     List<CalendarItem> getAllCalendarItems();
 
-
+    // Real time updates after loading the app
     @Query("SELECT * FROM calendarItems")
     LiveData<List<CalendarItem>> getAllCalendarItemsLive();
 
-    // date is like 2004-10-28
-
-    @Query("SELECT * FROM calendarItems WHERE date = :date")
-    LiveData<CalendarItem> getCalendarItemByDateLive(String date);
-
+    // For periodic updates and conflict resolution
     @Query("SELECT * FROM calendarItems WHERE date >= :startDate AND date <= :endDate")
     List<CalendarItem> getCalendarItemsForDateRangeSync(Date startDate, Date endDate);
 
+    //    @Query("SELECT * FROM calendarItems WHERE date = :date")
+//    LiveData<CalendarItem> getCalendarItemByDateLive(String date);
 }

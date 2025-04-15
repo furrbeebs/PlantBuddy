@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.app0.ProgressPage;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.CalendarItem;
-import com.example.app0.data.Repository.CalendarItemRepository;
 import com.example.app0.models.Mood;
 import com.example.app0.ui.ViewModel.CalendarItemViewModel;
 import com.example.app0.moodtracker.MoodCalendarView;
@@ -37,7 +36,6 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 
 public class MoodFragment extends Fragment {
-    private CalendarItemRepository calendarItemRepository;
     private CalendarItemViewModel moodViewModel;
     private MoodCalendarView moodCalendar;
     private LinearLayout moodDetailsContainer;
@@ -53,15 +51,16 @@ public class MoodFragment extends Fragment {
     private Button saveButton;
 
     // Edit and Delete buttons
-    private Button updateButton;
+    private Button editButton;
     private Button deleteButton;
 
-    // Back Button to Home Page
+    // Back Button to Home/Progress Page
     private ImageButton backButton;
 
     // Currently selected date
     private int selectedYear, selectedMonth, selectedDay;
     private int selectedMoodResId;
+
     // Flag to track if we're editing or creating new
     private boolean isEditMode = false;
 
@@ -101,13 +100,11 @@ public class MoodFragment extends Fragment {
         notesInput = moodDialog.findViewById(R.id.notes_input);
         saveButton = moodDialog.findViewById(R.id.done_button);
 
-        // Initialize month selector
+        // Initialize dropdown menu / title
         monthTextView = rootView.findViewById(R.id.month_text);
 
-
-        // Set click listener to show month picker
+        // Set click listener to show drop down menu of month & year
         monthTextView.setOnClickListener(v -> showMonthYearPicker());
-
 
         // Create and add the update and delete buttons
         LinearLayout buttonLayout = new LinearLayout(requireContext());
@@ -116,9 +113,11 @@ public class MoodFragment extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-        // drop down menu
+        // Update title (month/year)
         updateMonthYearDisplay();
+
         // In onCreateView, after initializing moodCalendar
+        // If month changed, set the new month and new year & update header
         moodCalendar.setOnMonthChangedListener((year, month) -> {
             currentCalendar.set(Calendar.YEAR, year);
             currentCalendar.set(Calendar.MONTH, month);
@@ -135,10 +134,10 @@ public class MoodFragment extends Fragment {
         });
 
         // Create Update Button
-        updateButton = new Button(requireContext());
-        updateButton.setLayoutParams(new LinearLayout.LayoutParams(
+        editButton = new Button(requireContext());
+        editButton.setLayoutParams(new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        updateButton.setText("Edit");
+        editButton.setText("Edit");
 
         // Create Delete Button
         deleteButton = new Button(requireContext());
@@ -147,7 +146,7 @@ public class MoodFragment extends Fragment {
         deleteButton.setText("Delete");
 
         // Add buttons to layout
-        buttonLayout.addView(updateButton);
+        buttonLayout.addView(editButton);
         buttonLayout.addView(deleteButton);
 
         // Add button layout to moodDetailsContainer
@@ -156,28 +155,29 @@ public class MoodFragment extends Fragment {
         // Set up mood selection in dialog
         setupMoodSelectionListeners();
 
-        // Set up close dialog button
+        // When closeMoodDialog button is clickedm close the view
         closeMoodDialog.setOnClickListener(v -> moodDialog.setVisibility(View.GONE));
 
         // Set up save button
         saveButton.setOnClickListener(v -> {
+            // If isEditMode = true -> there is change in mood on that day
             if (isEditMode) {
                 updateMoodEntry();
+                // If there is no change
             } else {
                 saveMoodEntry();
             }
         });
 
         // Set up edit button listener
-        updateButton.setOnClickListener(v -> {
+        editButton.setOnClickListener(v -> {
+            // Get data for that day
             MoodCalendarView.MoodEntry currentEntry = moodCalendar.getMoodEntry(
                     selectedYear, selectedMonth, selectedDay);
+            isEditMode = true;
+            showMoodDialogForEdit(selectedYear, selectedMonth, selectedDay,
+                    currentEntry.getMoodResId(), currentEntry.getNotes());
 
-            if (currentEntry != null) {
-                isEditMode = true;
-                showMoodDialogForEdit(selectedYear, selectedMonth, selectedDay,
-                        currentEntry.getMoodResId(), currentEntry.getNotes());
-            }
         });
 
         // Set up delete button listener
@@ -190,9 +190,6 @@ public class MoodFragment extends Fragment {
             selectedYear = year;
             selectedMonth = month;
             selectedDay = day;
-
-            // Update ViewModel with selected date
-            //moodViewModel.setSelectedDate(year, month, day);
 
             // Reset edit mode flag for new selections
             isEditMode = false;
@@ -279,12 +276,6 @@ public class MoodFragment extends Fragment {
         // Update dialog title/button text for new entry
         saveButton.setText("Save");
 
-        // Format and display the date
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
-        String formattedDate = dateFormat.format(calendar.getTime());
-
         // Hide details and show dialog
         moodDetailsContainer.setVisibility(View.GONE);
         moodDialog.setVisibility(View.VISIBLE);
@@ -302,12 +293,6 @@ public class MoodFragment extends Fragment {
 
         // Update dialog title/button text for editing
         saveButton.setText("Update");
-
-        // Format and display the date
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
-        String formattedDate = dateFormat.format(calendar.getTime());
 
         // Hide details and show dialog
         moodDetailsContainer.setVisibility(View.GONE);
@@ -351,7 +336,7 @@ public class MoodFragment extends Fragment {
 
     private void saveMoodEntry() {
         if (selectedMoodResId == 0) {
-            // No mood selected, show error or select default
+            // No mood selected, select default
             selectedMoodResId = R.drawable.mood_neutral;
         }
 
@@ -427,7 +412,6 @@ public class MoodFragment extends Fragment {
                 requireActivity().runOnUiThread(() -> {
                     // Close dialog and show details
                     moodDialog.setVisibility(View.GONE);
-                    isEditMode = false;
 
                     // Create entry for display
                     MoodCalendarView.MoodEntry entry = new MoodCalendarView.MoodEntry(
@@ -497,6 +481,7 @@ public class MoodFragment extends Fragment {
         }
     }
 
+    // Scrolling wheel after clicking dropdown menu (monthYearText)
     private void showMonthYearPicker() {
         // Create a custom dialog for month-year picker
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -519,10 +504,12 @@ public class MoodFragment extends Fragment {
         calendarViewDate.set(
                 moodCalendar.getCurrentYear(),
                 moodCalendar.getCurrentMonth(),
-                1
+                3
+                // date can be set to any value it doesnt matter
         );
 
-        // Set current values in pickers
+        // Set current values in pickers (scroll wheel position will be at the one
+        // at the calendar layout heading month/year
         monthPicker.setValue(calendarViewDate.get(Calendar.MONTH));
 
         // Set up year picker
@@ -541,7 +528,8 @@ public class MoodFragment extends Fragment {
             int selectedYear = yearPicker.getValue();
 
             // Update the calendar to display the selected month
-            moodCalendar.setDisplayMonth(selectedYear, selectedMonth);
+            moodCalendar.updateCalendarTitle();
+            moodCalendar.setCalendarLayoutHeader(selectedYear, selectedMonth);
 
             // Update the month text display
             currentCalendar.set(Calendar.YEAR, selectedYear);
@@ -556,14 +544,14 @@ public class MoodFragment extends Fragment {
         dialog.show();
     }
 
+    // This is different from the updateCalendarTitle() from MoodCalendarView
+    // It does not update the calendar grid
     private void updateMonthYearDisplay() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
         monthTextView.setText(dateFormat.format(currentCalendar.getTime()));
+
+
     }
-
-
-
-
 
 
 }

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -14,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+
 import androidx.annotation.Nullable;
 
 import com.example.app0.R;
@@ -30,12 +29,19 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MoodCalendarView extends LinearLayout {
+
+    // selectedPosition on the calendar grid (date box)
     private int selectedPosition;
-    private TextView monthYearText;
+    private TextView monthYearText; // Header month/year
     private GridView calendarGrid;
+
+    //  Object that manages how dates are displayed in calendar grid
     private CalendarAdapter adapter;
+
+    // Object that holds date, month, year and time
     private Calendar currentCalendar = Calendar.getInstance();
     private OnDateSelectedListener dateSelectedListener;
+    private OnMonthChangedListener monthChangedListener;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     // Map to store mood data: date string -> MoodEntry
@@ -51,28 +57,35 @@ public class MoodCalendarView extends LinearLayout {
         init(context);
     }
 
+    // Interface for date selection when tapped
+    public interface OnDateSelectedListener {
+        void onDateSelected(int year, int month, int day, @Nullable MoodEntry moodEntry);
+    }
+    public void setOnDateSelectedListener(OnDateSelectedListener listener) {
+        this.dateSelectedListener = listener;
+    }
+
+    // Interface for month change
     public interface OnMonthChangedListener {
         void onMonthChanged(int year, int month);
     }
-
-    private OnMonthChangedListener monthChangedListener;
-
     public void setOnMonthChangedListener(OnMonthChangedListener listener) {
         this.monthChangedListener = listener;
     }
 
     public void setSelectedPosition(int position) {
         this.selectedPosition = position;
+        // if adapter exist
         if (adapter != null) {
             adapter.setSelectedPosition(position);
         }
     }
 
-
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.calendar_layout, this, true);
 
         // Initialize views
+        // month/year (title)
         monthYearText = findViewById(R.id.month_year_text);
         calendarGrid = findViewById(R.id.calendar_grid);
         ImageButton prevButton = findViewById(R.id.prev_month_button);
@@ -80,7 +93,9 @@ public class MoodCalendarView extends LinearLayout {
 
         prevButton.setOnClickListener(v -> {
             currentCalendar.add(Calendar.MONTH, -1);
-            updateCalendar();
+            updateCalendarTitle();
+
+            // If listener exist, get the current year and month
             if (monthChangedListener != null) {
                 monthChangedListener.onMonthChanged(
                         currentCalendar.get(Calendar.YEAR),
@@ -91,7 +106,9 @@ public class MoodCalendarView extends LinearLayout {
 
         nextButton.setOnClickListener(v -> {
             currentCalendar.add(Calendar.MONTH, 1);
-            updateCalendar();
+            updateCalendarTitle();
+
+            // If listener exist, get the current year and month
             if (monthChangedListener != null) {
                 monthChangedListener.onMonthChanged(
                         currentCalendar.get(Calendar.YEAR),
@@ -100,24 +117,26 @@ public class MoodCalendarView extends LinearLayout {
             }
         });
 
-        // selected position
-
         // Set up calendar adapter
         adapter = new CalendarAdapter(context);
         calendarGrid.setAdapter(adapter);
 
-        // Set date click listener
-        // In your click listener:
+        // Set date click listener (when user taps on a date of the grid)
         calendarGrid.setOnItemClickListener((parent, view, position, id) -> {
+            // Get the date based on the position/box that user tapped
             CalendarAdapter.CalendarDate date = adapter.getItem(position);
 
+            // If the tapped date's month is the same as the CURRENT month that is showing
             if (date.getMonth() == currentCalendar.get(Calendar.MONTH)) {
+                // get the date
                 String dateKey = getDateKey(date.getYear(), date.getMonth(), date.getDay());
 
-                // Update the selected position properly
+                // Update the selected position
                 setSelectedPosition(position);
 
+                // If dataSelectedListener exist
                 if (dateSelectedListener != null) {
+                    // Use its own method to get the date
                     dateSelectedListener.onDateSelected(
                             date.getYear(),
                             date.getMonth(),
@@ -127,48 +146,41 @@ public class MoodCalendarView extends LinearLayout {
                 }
             }
         });
-
-        // Initialize with current month
-        updateCalendar();
     }
 
-    public void setDisplayMonth(int year, int month) {
-        // Update the calendar to display the specified month
-        currentCalendar.set(Calendar.YEAR, year);
-        currentCalendar.set(Calendar.MONTH, month);
-        currentCalendar.set(Calendar.DAY_OF_MONTH, 1);
-
-        // Update calendar display
-        updateCalendar();
-    }
-
-    private void updateCalendar() {
-        // Update month/year display
+    // Update the calendar page title (month/year > = monthYearText) & sync it with the
+    // calendar < month/year > title
+    public void updateCalendarTitle() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
         monthYearText.setText(dateFormat.format(currentCalendar.getTime()));
 
         // Update grid
-        adapter.updateCalendar(currentCalendar, moodEntries);
+        adapter.updateCalendarGrid(currentCalendar, moodEntries);
+    }
+
+    // Update the header (< month/year >) inside calendar
+    public void setCalendarLayoutHeader(int year, int month) {
+        // Update the calendar + header (month/year)
+        currentCalendar.set(Calendar.YEAR, year);
+        currentCalendar.set(Calendar.MONTH, month);
+
+        // Update calendar display title
+        updateCalendarTitle();
     }
 
     public void setMoodEntry(int year, int month, int day, int moodResId, String notes) {
         String dateKey = getDateKey(year, month, day);
         MoodEntry entry = new MoodEntry(dateKey, moodResId, notes);
         moodEntries.put(dateKey, entry);
-        updateCalendar();
     }
 
     public MoodEntry getMoodEntry(int year, int month, int day) {
         return moodEntries.get(getDateKey(year, month, day));
     }
 
-    public void setOnDateSelectedListener(OnDateSelectedListener listener) {
-        this.dateSelectedListener = listener;
-    }
-
-    // Interface for date selection callback
-    public interface OnDateSelectedListener {
-        void onDateSelected(int year, int month, int day, @Nullable MoodEntry moodEntry);
+    public void removeMoodEntry(int year, int month, int day) {
+        String dateKey = getDateKey(year, month, day);
+        moodEntries.remove(dateKey);
     }
 
     // Class for mood entries
@@ -196,17 +208,12 @@ public class MoodCalendarView extends LinearLayout {
         }
     }
 
-    public void removeMoodEntry(int year, int month, int day) {
-        String dateKey = getDateKey(year, month, day);
-        moodEntries.remove(dateKey);
-        updateCalendar();
-    }
-
     // Helper method to create consistent date keys
     private String getDateKey(int year, int month, int day) {
         return String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day);
     }
 
+    // 2 methods below are used in Mood Fragment for easier access
     public int getCurrentYear() {
         return currentCalendar.get(Calendar.YEAR);
     }
@@ -215,29 +222,34 @@ public class MoodCalendarView extends LinearLayout {
         return currentCalendar.get(Calendar.MONTH);
     }
 
-
+    // Converts data in a list to map
     public void updateWithCalendarItems(List<CalendarItem> items) {
         moodEntries.clear();
+        // If there is data(CalendarItems) inside the list
         if (items != null) {
             for (CalendarItem item : items) {
+                // Get the date
                 Date date = item.getDate();
+                // If date exist
                 if (date != null) {
                     try {
                         String dateKey = DATE_FORMAT.format(date);
+                        // Insert into the map
                         moodEntries.put(dateKey, new MoodEntry(
                                 dateKey,
                                 item.getMood().getIconResId(),
                                 item.getEntry())
                         );
                     } catch (Exception e) {
-                        Log.e("MoodCalendarView", "Error processing calendar item", e);
+                        Log.e("MoodCalendarView", "Error processing calendar item into moodEntries Map", e);
                     }
                 } else {
                     Log.w("MoodCalendarView", "Encountered CalendarItem with null date");
                 }
             }
         }
-        updateCalendar();
+        updateCalendarTitle();
+        // ^ Contains  adapter.updateCalendarGrid which updates the calendar grid
     }
 
     // Adapter for calendar grid
@@ -245,21 +257,20 @@ public class MoodCalendarView extends LinearLayout {
         private final Context context;
         private final List<CalendarDate> cells = new ArrayList<>();
         private final LayoutInflater inflater;
-        private int selectedPosition = -1; // Store selected position here
+        private int selectedPosition; // Store selected position here
 
         public CalendarAdapter(Context context) {
             this.context = context;
             this.inflater = LayoutInflater.from(context);
         }
 
-        // In the CalendarAdapter inner class
         public void setSelectedPosition(int position) {
             this.selectedPosition = position;
+            // Indicate a change in data & refresh the UI
             notifyDataSetChanged();
         }
 
-
-        public void updateCalendar(Calendar calendar, Map<String, MoodEntry> moodEntries) {
+        public void updateCalendarGrid(Calendar calendar, Map<String, MoodEntry> moodEntries) {
             cells.clear();
 
             // Get current month and year
@@ -270,7 +281,7 @@ public class MoodCalendarView extends LinearLayout {
             Calendar monthCalendar = (Calendar) calendar.clone();
             monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
 
-            // Get the day of week for the first day of month (0 = Sunday, 1 = Monday, etc.)
+            // Get the WEEK DAY of the first day. Need to -1 because 0 - 6 buy dayof week return 1-7
             int firstDayOfMonth = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
 
             // Get the last day of the month
@@ -305,7 +316,6 @@ public class MoodCalendarView extends LinearLayout {
         }
 
 
-
         @Override
         public int getCount() {
             return cells.size();
@@ -331,16 +341,6 @@ public class MoodCalendarView extends LinearLayout {
             // Get day information
             CalendarDate date = getItem(position);
 
-            // Use the local selectedPosition instead of trying to access it through parent hierarchy
-            if (position == selectedPosition) {
-                // This is the selected cell
-                cellView.setBackgroundResource(R.drawable.selected_day_background);
-            } else {
-                // Reset background
-                cellView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            }
-
-
             // Update views
             TextView dayText = cellView.findViewById(R.id.day_text);
             ImageView moodIcon = cellView.findViewById(R.id.mood_icon);
@@ -350,8 +350,7 @@ public class MoodCalendarView extends LinearLayout {
                 // This is a placeholder - make it blank/invisible
                 dayText.setText("");
                 moodIcon.setVisibility(View.INVISIBLE);
-                // Make the cell background transparent or match your calendar background
-                cellView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+
             } else {
                 // This is a real date - show it normally
                 dayText.setText(String.valueOf(date.getDay()));
@@ -363,28 +362,9 @@ public class MoodCalendarView extends LinearLayout {
                 } else {
                     moodIcon.setVisibility(View.GONE);
                 }
-
-
-
-                // Reset cell background if needed
-                cellView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
             }
-
             return cellView;
         }
-
-//    public void setDisplayMonth(int year, int month) {
-//        // Update the calendar to display the specified month
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(Calendar.YEAR, year);
-//        calendar.set(Calendar.MONTH, month);
-//        calendar.set(Calendar.DAY_OF_MONTH, 1);
-//
-//        // Update your calendar view with the new month
-//        // Implement according to how your MoodCalendarView is structured
-//
-//        invalidate(); // Redraw the view
-//    }
 
 
         // Data class for calendar dates

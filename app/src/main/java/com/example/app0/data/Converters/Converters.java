@@ -1,8 +1,6 @@
 package com.example.app0.data.Converters;
 
-import android.text.TextUtils;
 import android.util.Log;
-
 import androidx.room.TypeConverter;
 
 import java.text.ParseException;
@@ -21,7 +19,7 @@ public class Converters {
             return null;
         }
         try {
-            // Ensure we're using the proper format
+            // Convert Date to String for storing in Database
             return DATE_FORMAT.parse(value);
         } catch (ParseException e) {
             Log.e(TAG, "Failed to parse date string: " + value, e);
@@ -35,7 +33,7 @@ public class Converters {
             Log.w(TAG, "Attempted to convert null date");
             return null;
         }
-        // Ensure consistent date formatting
+        // Convert Date to String for reading
         return DATE_FORMAT.format(date);
     }
 }

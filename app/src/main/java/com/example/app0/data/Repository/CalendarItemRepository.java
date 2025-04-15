@@ -25,7 +25,6 @@ public class CalendarItemRepository {
     private final CalendarItemDao calendarItemDao;
     private final LiveData<List<CalendarItem>> allCalendarItems;
     private final ExecutorService executorService;
-    // private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     public CalendarItemRepository(Application application) {
         // Initialize the Room database instance (singleton pattern)
@@ -52,42 +51,14 @@ public class CalendarItemRepository {
         executorService.execute(() -> calendarItemDao.updateCalendarItem(calendarItem));
     }
 
+    // NOT using because delete requires Calendar Item ID which we do not have access to,
+    // We will use deleteItemByDate
     public void delete(CalendarItem calendarItem) {
         executorService.execute(() -> calendarItemDao.deleteCalendarItem(calendarItem));
     }
 
     public void cleanUp() {
         executorService.shutdown();
-    }
-
-    public void insertMoodEntry(int year, int month, int day, Mood mood, String notes) {
-        // Create date (month is 0-based in Calendar)
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        Date date = calendar.getTime();
-
-        // Create calendar item
-        CalendarItem item = new CalendarItem(date, mood, notes);
-
-        // Insert into database
-        insert(item);
-    }
-
-
-    public void deleteMoodEntry(Date date) {
-        if (date == null) {
-            Log.e("Repository", "Cannot delete with null date");
-            return;
-        }
-
-        executorService.execute(() -> {
-            try {
-                // Delete by date
-                calendarItemDao.deleteCalendarItemByDate(date);
-            } catch (Exception e) {
-                Log.e("Repository", "Error deleting by date: " + e.getMessage());
-            }
-        });
     }
 
     public List<CalendarItem> getCalendarItemsForDateRangeSync(Date startDate, Date endDate) {
@@ -108,13 +79,16 @@ public class CalendarItemRepository {
                 }
             });
 
-            // Wait for the operation to complete with a timeout
+            // Wait for the operation to complete with a timeout(3s)
             boolean completed = latch.await(3, TimeUnit.SECONDS);
+            // Took longer than 3s
             if (!completed) {
                 Log.e("Repository", "Database operation timed out");
                 return new ArrayList<>();
             }
 
+
+            // if result is not empty, return the result array, else return empty array list
             return result[0] != null ? result[0] : new ArrayList<>();
         } catch (InterruptedException e) {
             Log.e("Repository", "Database operation interrupted", e);
@@ -122,4 +96,35 @@ public class CalendarItemRepository {
             return new ArrayList<>();
         }
     }
+
+    public void insertMoodEntry(int year, int month, int day, Mood mood, String notes) {
+        // Create date (month is 0-based in Calendar)
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        Date date = calendar.getTime();
+
+        // Create calendar item
+        CalendarItem item = new CalendarItem(date, mood, notes);
+
+        // Insert into database
+        insert(item);
+    }
+
+    public void deleteMoodEntry(Date date) {
+        if (date == null) {
+            Log.e("Repository", "Cannot delete with null date");
+            return;
+        }
+
+        executorService.execute(() -> {
+            try {
+                // Delete by date
+                calendarItemDao.deleteCalendarItemByDate(date);
+            } catch (Exception e) {
+                Log.e("Repository", "Error deleting by date: " + e.getMessage());
+            }
+        });
+    }
+
+
 }

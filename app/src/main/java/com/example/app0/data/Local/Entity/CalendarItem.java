@@ -36,5 +36,7 @@ public class CalendarItem {
     public Mood getMood() { return mood; }
     public void setMood(Mood mood) { this.mood = mood; }
     public String getEntry() { return entry; }
+
+    // not used
     public void setEntry(String entry) { this.entry = entry; }
 }
