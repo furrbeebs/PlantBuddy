@@ -27,6 +27,7 @@ import com.example.app0.data.Local.Entity.Difficulty;
 import com.example.app0.data.Local.Entity.Goal;
 import com.example.app0.data.Local.Entity.GoalInstance;
 import com.example.app0.data.Local.Entity.Repeat;
+import com.example.app0.data.Repository.PlantBuddyRepository;
 import com.example.app0.ui.Activity.UpdateActivity;
 
 import java.text.SimpleDateFormat;
@@ -128,6 +129,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             if (listener != null) {
 //                listener.onGoalStatusToggled(goal);
                 listener.onGoalUpdated(null, goal);
+
             }
 
             // UpdateActivity.updatePointBalance(DifficultyConverter.fromDifficulty(goal.getDifficulty()));
