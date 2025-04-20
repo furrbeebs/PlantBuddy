@@ -151,9 +151,6 @@ public class MoodCalendarView extends LinearLayout {
     // Update the calendar page title (month/year > = monthYearText) & sync it with the
     // calendar < month/year > title
     public void updateCalendarTitle() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-        monthYearText.setText(dateFormat.format(currentCalendar.getTime()));
-
         // Update grid
         adapter.updateCalendarGrid(currentCalendar, moodEntries);
     }

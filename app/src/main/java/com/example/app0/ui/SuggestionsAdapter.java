@@ -51,8 +51,8 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
         ViewHolder(View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.cardViewGoalSuggestion);   // ✅ Get CardView by ID
-            textView = itemView.findViewById(R.id.goalSuggestionTitle);   // ✅ Get TextView by ID
+            cardView = itemView.findViewById(R.id.cardViewGoalSuggestion);   // Get CardView by ID
+            textView = itemView.findViewById(R.id.goalSuggestionTitle);   // Get TextView by ID
         }
 
         void bind(String suggestion) {

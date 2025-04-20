@@ -30,14 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class GoalsRepository {
-//    private static final String PREFS_NAME = "GoalsPrefs";
-//    private static final String GOALS_MAP_KEY = "GoalsMap";
-//    private static final String NEXT_ID_KEY = "NextId";
-//    private static GoalsRepository instance;
-//    private final SharedPreferences prefs;
-//    private final Gson gson;
-//    private Map<String, List<Goal>> goalsMap; // Date -> Goals list
-//    private long nextId;
 
     private GoalDao goalDao;
     private GoalInstanceDao goalInstanceDao;

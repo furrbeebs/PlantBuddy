@@ -130,7 +130,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
                 listener.onGoalUpdated(null, goal);
             }
 
-            // UpdateActivity.updatePointBalance(DifficultyConverter.fromDifficulty(goal.getDifficulty()));
         });
 
         // ------------------ Repeat Spinner -------------------

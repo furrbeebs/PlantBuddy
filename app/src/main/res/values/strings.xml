@@ -45,7 +45,7 @@
         <item>Monthly</item>
     </string-array>
 
-    <!-- Add to your strings.xml file -->
+    <!-- Add to strings.xml file -->
     <string-array name="until_options">
         <item>Forever</item>
         <item>1 week</item>

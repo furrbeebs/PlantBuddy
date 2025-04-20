@@ -54,7 +54,6 @@ public class ProgressPage extends AppCompatActivity {
         CheckForms2025 checkform = new CheckForms2025();
         int maxXP = checkform.maxXP(current_level);
         progressBar.setMax(maxXP);
-        //progressBar.setProgress((int)Math.round(current_XP));
         progressBar.setProgress(900);  // Manual Entry for Testing
 
 
@@ -70,7 +69,6 @@ public class ProgressPage extends AppCompatActivity {
 
         // Lottie Animation Section
         animation = findViewById(R.id.plant_animation);
-        //current_form = checkform.display(current_level);
         current_form = "Sapling";   // for testing purposes
 
         if (current_form.equals("Seedling")) { animation.setAnimation(R.raw.sprout); }
@@ -85,21 +83,14 @@ public class ProgressPage extends AppCompatActivity {
 
         goals.setOnClickListener(v -> {
             Intent intent = new Intent(ProgressPage.this, GoalsActivity.class);
-
             startActivity(intent);
         });
 
         journal.setOnClickListener(v -> {
-            //Intent intent = new Intent(ProgressPage.this, MainActivity.class);
-            //startActivity(intent);
+
         });
 
         mood.setOnClickListener(v -> {
-
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.fragment_container, new MoodFragment())
-//                    .commit();
             Intent intent = new Intent(ProgressPage.this, MoodActivity.class);
             startActivity(intent);
 

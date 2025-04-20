@@ -24,7 +24,7 @@ public class UpdateActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra("runFunction", false)) {
-            updatePointBalance(100); // 🔁 Call your function here
+            updatePointBalance(100); // Call your function here
         }
     }
 
