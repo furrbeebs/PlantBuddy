@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.AddUserActivity">
+
+    <EditText
+        android:id="@+id/UserNameInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/NameInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Plant Name"
+        app:layout_constraintTop_toBottomOf="@id/UserNameInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/LevelInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Level"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/NameInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/XPInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="XP"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/LevelInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/ImageInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Image"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/XPInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Save User"
+        app:layout_constraintTop_toBottomOf="@id/ImageInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
