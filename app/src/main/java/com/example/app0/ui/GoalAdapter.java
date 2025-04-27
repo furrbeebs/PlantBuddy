@@ -12,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
@@ -40,12 +41,14 @@ import java.util.Locale;
 public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder> {
 
     private List<GoalInstance> goalInstances;
-    private final String[] frequencies = {"Daily", "Weekly", "Monthly"};
-    private int curr_index, next_index;
-    private boolean checkedState, newState;
     private OnGoalChangeListener listener;
-    private SimpleDateFormat otherFormatter, dayFormatter, dateFormatter;
-    private Date selectDate;
+    private SimpleDateFormat otherFormatter;
+    private boolean isPastDate = false;
+
+    public void setIsPastDate(boolean isPastDate) {
+        this.isPastDate = isPastDate;
+        notifyDataSetChanged(); // refresh view to apply changes
+    }
 
     public interface OnGoalChangeListener {
         void onGoalUpdated(Goal goal, GoalInstance goalInstance);
@@ -57,19 +60,16 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         this.goalInstances = goalInstances;
     }
 
-    // Add a method to set the listener
+    // set listeners
     public void setOnGoalChangeListener(OnGoalChangeListener listener) {
         this.listener = listener;
-    }
-
-    public List<GoalInstance> getGoalInstances() {
-        return goalInstances;
     }
 
     public void updateGoalInstances(List<GoalInstance> newGoalInstances) {
         this.goalInstances = newGoalInstances;
         notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
@@ -86,18 +86,65 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
         GoalInstance goal = goalInstances.get(position);
 
+        if (goal.getCompleted()) {
+            holder.checkmark.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.checkmark.setVisibility(View.GONE);
+        }
+
+        // disabling edit button and greying out depending on whether its in the past
+        holder.editButton.setEnabled(!isPastDate);
+
+        if (isPastDate) {
+            holder.editButton.setAlpha(0.5f);
+        }
+        else {
+            holder.editButton.setAlpha(1.0f);
+        }
+
+        // disable checkbox visually depending on whether its in the past
+        holder.checkboxBackground.setEnabled(!isPastDate);
+        holder.checkmark.setEnabled(!isPastDate);
+
+
+        // only setting click listeners if it's not a past date
+        // making function since its the same code for the two setOnClickListeners
+        if (!isPastDate) {
+            View.OnClickListener toggleCheckListeners = v -> {
+                boolean newStatus = !goal.getCompleted();
+                goal.setCompleted(newStatus);
+
+                if (newStatus) {
+                    holder.checkmark.setVisibility(View.VISIBLE);
+                }
+                else {
+                    holder.checkmark.setVisibility(View.GONE);
+                }
+
+                if (listener != null) {
+                    listener.onGoalStatusToggled(goal);
+                }
+            };
+
+            holder.checkboxBackground.setOnClickListener(toggleCheckListeners);
+            holder.checkmark.setOnClickListener(toggleCheckListeners);
+
+        }
+
+        // if past date, set both click listeners to null so that nothing happens on click
+        else {
+            holder.checkmark.setOnClickListener(null);
+            holder.checkboxBackground.setOnClickListener(null);
+        }
+
         holder.title.setText(goal.getTitle());
         holder.frequencyText.setText(RepeatConverter.fromRepeat(goal.getRepeat()));
         holder.sun_points.setText(String.valueOf(DifficultyConverter.fromDifficulty(goal.getDifficulty())));
-        checkedState = false;
 
         otherFormatter = new SimpleDateFormat("dd MMM YYYY", Locale.getDefault());
-        dayFormatter = new SimpleDateFormat("EEE", Locale.getDefault());
-        dateFormatter = new SimpleDateFormat("dd", Locale.getDefault());
 
-        Calendar calendar = Calendar.getInstance();
         Calendar selectedDate = Calendar.getInstance();
-        Date curr_date = calendar.getTime();
 
 
         // ---------- GoalItemContainer Portion ----------
@@ -116,21 +163,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             holder.editEndDate.setText(otherFormatter.format(goal.getUntilDate().getTime()));
         }
 
-        holder.checkboxBackground.setOnClickListener(v -> {
-            // Toggle completion status
-            boolean newStatus = !goal.getCompleted();
-            goal.setCompleted(newStatus);
-
-            // Update the UI
-            holder.checkmark.setVisibility(newStatus ? View.VISIBLE : View.GONE);
-
-            // Notify listener about status change
-            if (listener != null) {
-//                listener.onGoalStatusToggled(goal);
-                listener.onGoalUpdated(null, goal);
-            }
-
-        });
 
         // ------------------ Repeat Spinner -------------------
         ArrayAdapter<CharSequence> repeatAdapter = ArrayAdapter.createFromResource(
@@ -138,27 +170,11 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         repeatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         holder.editFrequencyBtn.setAdapter(repeatAdapter);
 
-        // Sets default option for Repeat based on DB data
+        // sets starting selection from DB
         String[] repeat_options = holder.itemView.getContext().getResources().getStringArray(R.array.repeat_options);
         int startingSelection_repeat = Arrays.asList(repeat_options).indexOf(RepeatConverter.fromRepeat(goal.getRepeat()));
-        holder.editFrequencyBtn.setSelection(startingSelection_repeat); // Sets starting selection from DB
+        holder.editFrequencyBtn.setSelection(startingSelection_repeat);
 
-        holder.editFrequencyBtn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            boolean FirstRun = true;
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                String selected = parent.getItemAtPosition(pos).toString();
-                if (FirstRun == true) {
-                    FirstRun = false;
-                    return;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         // -------------------- Difficulty Spinner -----------------------
         ArrayAdapter<CharSequence> difficultyAdapter = ArrayAdapter.createFromResource(
@@ -166,10 +182,10 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         holder.editSun.setAdapter(difficultyAdapter);
 
-        // Sets default option for Difficulty Spinner based on DB
+        // sets starting selection from DB
         String[] difficulty_options = holder.itemView.getContext().getResources().getStringArray(R.array.difficulty_options);
         int startingSelection_difficulty = Arrays.asList(difficulty_options).indexOf(DifficultyConverter.fromDifficultyToString(goal.getDifficulty()));
-        holder.editSun.setSelection(startingSelection_difficulty); // Sets starting selection from DB
+        holder.editSun.setSelection(startingSelection_difficulty);
 
         // --------------------- Start Date Button ---------------------
         holder.startDate.setOnClickListener( v-> {
@@ -252,9 +268,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
         // ---------------------- Save Button -------------------------
         holder.saveBtn.setOnClickListener( v-> {
-            holder.goalItemContainer.setVisibility(View.VISIBLE);
-            holder.editGoalContainer.setVisibility(View.GONE);
-
             goal.setTitle(holder.editGoal.getText().toString());
 
             String selectedRepeat = holder.editFrequencyBtn.getSelectedItem().toString();
@@ -269,7 +282,9 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
                 listener.onGoalUpdated(null, goal);
             }
 
-            // Update UI
+            holder.goalItemContainer.setVisibility(View.VISIBLE);
+            holder.editGoalContainer.setVisibility(View.GONE);
+
             notifyItemChanged(holder.getAdapterPosition());
         });
     }
@@ -280,11 +295,12 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
     public static class GoalViewHolder extends RecyclerView.ViewHolder {
         TextView title, frequency, sun_points, frequencyText , editEndDate, editStartDate;
         ImageView checkboxBackground, checkmark;
-        ImageButton editButton, startDate, endDate;
+        ImageButton editButton, closeButton;
         ConstraintLayout goalItemContainer, editGoalContainer;
         Button saveBtn, deleteBtn;
         EditText editGoal;
         Spinner editFrequencyBtn, editSun;
+        LinearLayout startDate, endDate;
 
         public GoalViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -301,9 +317,10 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             editGoalContainer = itemView.findViewById(R.id.editGoalContainer);
             saveBtn = itemView.findViewById(R.id.saveEditGoalBtn);
             deleteBtn = itemView.findViewById(R.id.deleteBtn);
+            closeButton = itemView.findViewById(R.id.closeButton);
             editGoal = itemView.findViewById(R.id.goalTitleEdit);
-            startDate = itemView.findViewById(R.id.startDateBtn);
-            endDate = itemView.findViewById(R.id.endDateBtn);
+            startDate = itemView.findViewById(R.id.startDateSection);
+            endDate = itemView.findViewById(R.id.endDateSection);
             editFrequencyBtn = itemView.findViewById(R.id.editFrequencyBtn);
             editSun = itemView.findViewById(R.id.editSunDifficulty);
             editEndDate = itemView.findViewById(R.id.editEndDate);

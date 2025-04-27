@@ -19,8 +19,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,8 +44,8 @@ public class GoalsActivity extends AppCompatActivity {
 
     // Declaration of Variables
     private int num_of_goals;
-    private ImageButton backButton, expandButton, addGoalButton, btnAddGoal, sortButton;
-    private TextView toolbarTitle, goalsTitle, goalTitle;
+    private ImageButton backButton, expandButton, addGoalButton, sortButton;
+    private TextView toolbarTitle, goalsTitle;
     private LinearLayout dateBar;
     private Calendar calendar, selectedDate;
     private Date curr_date;
@@ -110,8 +108,15 @@ public class GoalsActivity extends AppCompatActivity {
                 if (isSameDay(selectedDate.getTime(), curr_date)) { toolbarTitle.setText(todayFormatter.format(selectedDate.getTime())); }  // if selected date is today
                 else { toolbarTitle.setText(otherFormatter.format(selectedDate.getTime())); }  // else follow normal format
                 ScrollableRow(selectedDate);
+
+                goalsViewModel.getGoalInstancesForDate(selectedDate).observe(this, newGoalInstances -> {
+                    goalInstances = newGoalInstances;
+                    adapter.updateGoalInstances(newGoalInstances);
+                    num_of_goals = newGoalInstances.size();
+                    goalsTitle.setText(num_of_goals + " Goals");
+                });
             },
-            selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH));  // show last selected date
+                    selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH));  // show last selected date
             datePickerDialog.show();
         });
 
@@ -147,12 +152,18 @@ public class GoalsActivity extends AppCompatActivity {
         adapter.setOnGoalChangeListener(new GoalAdapter.OnGoalChangeListener() {
             @Override
             public void onGoalUpdated(Goal goal, GoalInstance goalInstance) {
-                goalsViewModel.updateGoalInstance(goalInstance, selectedDate);
+
+                goalsViewModel.updateGoalInstance(goalInstance);
 
                 long goalId = goalInstance.getGoalId();
+                long instanceId = goalInstance.getId();
 
+                // updating the parent goal
                 goalsViewModel.getGoal(goalId, parentGoal -> {
                     if (parentGoal != null) {
+                        boolean startDateChanged = !parentGoal.getStartDate().equals(goalInstance.getStartDate());
+                        boolean endDateChanged = !parentGoal.getUntilDate().equals(goalInstance.getUntilDate());
+
                         parentGoal.setTitle(goalInstance.getTitle());
                         parentGoal.setRepeat(goalInstance.getRepeat());
                         parentGoal.setDifficulty(goalInstance.getDifficulty());
@@ -160,6 +171,12 @@ public class GoalsActivity extends AppCompatActivity {
                         parentGoal.setUntilDate(goalInstance.getUntilDate());
 
                         goalsViewModel.updateGoal(parentGoal);
+
+                        if (startDateChanged || endDateChanged) {
+                            Calendar today = Calendar.getInstance();
+                            goalsViewModel.deleteFutureGoalInstancesByGoalId(goalId, today, instanceId);
+                            goalsViewModel.createGoalInstancesForDate(today);
+                        }
                     }
                 });
             }
@@ -178,16 +195,16 @@ public class GoalsActivity extends AppCompatActivity {
                     goalsViewModel.deleteGoalInstanceByGoalId(goalId);
                 }
                 else {
-
-                    // Add exclusion and delete instance
+                    // exclude the date (in main goal object) and then delete the goal instance
                     goalsViewModel.excludeDateAndDeleteInstance(goalInstance.getGoalId(), date, goalInstance);
                 }
             }
 
             @Override
             public void onGoalStatusToggled(GoalInstance goalInstance) {
-                goalInstance.setCompleted(!goalInstance.getCompleted());
-                goalsViewModel.updateGoalInstance(goalInstance, selectedDate);
+                // to update the completed boolean
+                // only call update since i already did the flipping of bool in adapter
+                goalsViewModel.updateGoalInstance(goalInstance);
             }
         });
 
@@ -205,6 +222,14 @@ public class GoalsActivity extends AppCompatActivity {
         });
     }
 
+    private Button[] dateButtons = new Button[7];
+    private Button currentHighlightedButton = null;
+
+    private boolean isPastDate(Calendar date) {
+        Calendar today = Calendar.getInstance();
+        return date.before(today) && !isSameDay(date.getTime(), today.getTime());
+    }
+
     // Code Handling Scrollable Row of Dates
     private void ScrollableRow(Calendar startDate) {
         dateBar.removeAllViews();
@@ -220,6 +245,7 @@ public class GoalsActivity extends AppCompatActivity {
                 weekStart.add(Calendar.DAY_OF_MONTH, diff);
 
                 Button todayButton = null;
+                Button selectedDateButton = null;
 
                 for (int i = 0; i < 7; i++) {
                     Calendar days = (Calendar) weekStart.clone();
@@ -240,12 +266,21 @@ public class GoalsActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(buttonWidth, heightInPx);
                     btn.setLayoutParams(params);
 
+                    dateButtons[i] = btn;
+                    btn.setTag(days.getTime());
+
                     if (isSameDay(days.getTime(), new Date())) {
                         todayButton = btn;
                     }
 
+                    if (isSameDay(days.getTime(), selectedDate.getTime())) {
+                        selectedDateButton = btn;
+                    }
+
                     final Calendar finalDays = days;
                     btn.setOnClickListener(v -> {
+
+                        selectedDate.setTime(finalDays.getTime());
 
                         if (isSameDay(finalDays.getTime(), new Date())) {
                             toolbarTitle.setText(todayFormatter.format(finalDays.getTime()));
@@ -253,10 +288,13 @@ public class GoalsActivity extends AppCompatActivity {
                             toolbarTitle.setText(otherFormatter.format(finalDays.getTime()));
                         }
 
-                        // Get goals for the selected date
+                        boolean isPastDate = isPastDate(finalDays);
+
+                        // getting goal instances for the selected date
                         goalsViewModel.getGoalInstancesForDate(finalDays).observe(this, newGoalInstances -> {
                             goalInstances = newGoalInstances;
                             adapter.updateGoalInstances(newGoalInstances);
+                            adapter.setIsPastDate(isPastDate);
                             num_of_goals = newGoalInstances.size();
                             goalsTitle.setText(num_of_goals + " Goals");
                         });
@@ -266,13 +304,16 @@ public class GoalsActivity extends AppCompatActivity {
                     dateBar.addView(btn);
                 }
 
-                if (todayButton != null) {
-                    todayButton.performClick();         // force click button for today on create
+                // force clicking buttons
+                if (selectedDateButton != null) {
+                    selectedDateButton.performClick();
+                }
+                else if (todayButton != null) {
+                    todayButton.performClick();
                 }
             }
         });
     }
-    private Button currentHighlightedButton = null;
     private void highlightSelectedDateButton(Button btn) {
         if (currentHighlightedButton != null) {
             currentHighlightedButton.setBackgroundColor(Color.parseColor("#80CBC4"));

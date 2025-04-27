@@ -33,4 +33,7 @@ public interface GoalInstanceDao {
 
     @Query("delete from goalInstances where goalId = :goalId")
     public void deleteGoalInstanceByGoalId(long goalId);
+
+    @Query("delete from goalInstances where goalId = :goalId and instanceDate > :today and instanceId != :instanceId")
+    public void deleteFutureGoalInstancesByGoalId(long goalId, Calendar today, long instanceId);
 }

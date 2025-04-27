@@ -3,6 +3,8 @@ package com.example.app0.data.Repository;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -34,12 +36,14 @@ public class GoalsRepository {
     private GoalDao goalDao;
     private GoalInstanceDao goalInstanceDao;
     private ExecutorService executorService;
+    private final Handler handler;
 
     public GoalsRepository(Application application) {
         AppDatabase appDatabase = AppDatabase.getDatabase(application);
         goalDao = appDatabase.getGoalDao();
         goalInstanceDao = appDatabase.getGoalInstanceDao();
         executorService = Executors.newSingleThreadExecutor();
+        handler = new Handler(Looper.getMainLooper());
     }
 
     public interface DatabaseCallback<T> {
@@ -89,6 +93,10 @@ public class GoalsRepository {
         executorService.execute(() -> goalInstanceDao.deleteGoalInstanceByGoalId(goalId));
     }
 
+    public void deleteFutureGoalInstancesByGoalId(long goalId, Calendar today, long instanceId) {
+        executorService.execute(() -> goalInstanceDao.deleteFutureGoalInstancesByGoalId(goalId, today, instanceId));
+    }
+
     public void createGoalInstancesForDate(Calendar date) {
         executorService.execute(() -> {
             List<Goal> allGoals = goalDao.getAllGoals();
@@ -123,14 +131,25 @@ public class GoalsRepository {
         });
     }
 
+    public boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+                && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+                && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
     public void getGoal(long goalId, Consumer<Goal> callback) {
-        new Thread(() -> {
-            Goal goal = goalDao.getGoal(goalId);
-            // Return to main thread to update UI
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                callback.accept(goal);
-            });
-        }).start();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                final Goal goal = goalDao.getGoal(goalId);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.accept(goal);
+                    }
+                });
+            }
+        });
     }
 
     public LiveData<List<GoalInstance>> getGoalInstancesForTodayLive() {
@@ -145,12 +164,6 @@ public class GoalsRepository {
 
     public LiveData<List<GoalInstance>> getGoalInstancesForDateLive(Calendar date) {
         return goalInstanceDao.getGoalInstancesDateLive(date);
-    }
-
-    private boolean isSameDay(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
-                && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
-                && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
     }
 
     public void excludeDateAndDeleteInstance(long goalId, String dateId, GoalInstance instance) {
