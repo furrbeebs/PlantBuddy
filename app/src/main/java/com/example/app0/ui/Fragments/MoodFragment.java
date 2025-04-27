@@ -133,6 +133,7 @@ public class MoodFragment extends Fragment {
             startActivity(intent);
         });
 
+        // The buttons below are created by AI and edited by Ziwei because there was layout issues and buttons created on xml was not showing 
         // Create Update Button
         editButton = new Button(requireContext());
         editButton.setLayoutParams(new LinearLayout.LayoutParams(
@@ -380,10 +381,11 @@ public class MoodFragment extends Fragment {
         // Create the mood object safely
         Mood mood = Mood.fromResId(selectedMoodResId);
 
-        // Create a new calendar item with the date that is definitely not null
+        // Create a new calendar item with the date that is not null
         CalendarItem updatedItem = new CalendarItem(date, mood, notes);
 
         // Update in background thread
+        // this code below is written by AI and edited by Ziwei
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 // Get existing item to obtain its ID
