@@ -167,4 +167,6 @@
         tools:listitem="@layout/goal_item" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout> 
+
+<!--This xml was written with the help of AI and edited by Cho Lei Lei Mon-->
