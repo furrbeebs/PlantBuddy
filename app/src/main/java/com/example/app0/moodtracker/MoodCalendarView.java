@@ -220,6 +220,7 @@ public class MoodCalendarView extends LinearLayout {
     }
 
     // Converts data in a list to map
+    // This code is written and edited by Ziwei
     public void updateWithCalendarItems(List<CalendarItem> items) {
         moodEntries.clear();
         // If there is data(CalendarItems) inside the list
@@ -267,6 +268,7 @@ public class MoodCalendarView extends LinearLayout {
             notifyDataSetChanged();
         }
 
+        // The code below is written by AI and edited by Ziwei to ensure the calendar only shows dates of the current month
         public void updateCalendarGrid(Calendar calendar, Map<String, MoodEntry> moodEntries) {
             cells.clear();
 
@@ -342,6 +344,7 @@ public class MoodCalendarView extends LinearLayout {
             TextView dayText = cellView.findViewById(R.id.day_text);
             ImageView moodIcon = cellView.findViewById(R.id.mood_icon);
 
+            // This code is written by AI and edited by Ziwei
             // Check if this is a placeholder cell (day = -1)
             if (date.getDay() == -1) {
                 // This is a placeholder - make it blank/invisible
