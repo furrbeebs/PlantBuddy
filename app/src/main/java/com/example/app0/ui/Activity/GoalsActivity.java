@@ -151,7 +151,6 @@ public class GoalsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.goalsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // TODO: Added this portion here to obtain the PlantBuddy Object
         plantBuddyViewModel = new ViewModelProvider(this).get(PlantBuddyViewModel.class);
         plantBuddyViewModel.getPlantBuddy().observe(this, plantBuddy -> {
             if (plantBuddy != null) {

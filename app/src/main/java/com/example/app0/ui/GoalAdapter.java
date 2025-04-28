@@ -32,7 +32,6 @@ import com.example.app0.data.Local.Entity.Goal;
 import com.example.app0.data.Local.Entity.GoalInstance;
 import com.example.app0.data.Local.Entity.PlantBuddy;
 import com.example.app0.data.Local.Entity.Repeat;
-import com.example.app0.ui.Activity.UpdateActivity;
 import com.example.app0.ui.ViewModel.PlantBuddyViewModel;
 
 import java.text.SimpleDateFormat;
