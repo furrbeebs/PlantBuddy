@@ -1,8 +1,11 @@
 package com.example.app0.ui;
 
+import static com.example.app0.data.Converters.DifficultyConverter.fromDifficulty;
+
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +30,10 @@ import com.example.app0.data.Converters.RepeatConverter;
 import com.example.app0.data.Local.Entity.Difficulty;
 import com.example.app0.data.Local.Entity.Goal;
 import com.example.app0.data.Local.Entity.GoalInstance;
+import com.example.app0.data.Local.Entity.PlantBuddy;
 import com.example.app0.data.Local.Entity.Repeat;
 import com.example.app0.ui.Activity.UpdateActivity;
+import com.example.app0.ui.ViewModel.PlantBuddyViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -45,6 +50,15 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
     private SimpleDateFormat otherFormatter;
     private boolean isPastDate = false;
 
+    private PlantBuddyViewModel plantBuddyViewModel;
+    private String username, plantname;
+    private int level, image;
+
+    private double xp;
+    private double[] doubleContainer;
+
+    private PlantBuddy plantBuddy;
+
     public void setIsPastDate(boolean isPastDate) {
         this.isPastDate = isPastDate;
         notifyDataSetChanged(); // refresh view to apply changes
@@ -56,8 +70,15 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         void onGoalStatusToggled(GoalInstance goalInstance);
     }
 
-    public GoalAdapter(List<GoalInstance> goalInstances) {
+    public GoalAdapter(List<GoalInstance> goalInstances, PlantBuddyViewModel plantBuddyViewModel, PlantBuddy plantBuddy) {
         this.goalInstances = goalInstances;
+        this.plantBuddyViewModel = plantBuddyViewModel;
+        this.plantBuddy = plantBuddy;
+    }
+
+    // Update PlantBuddy after Observing
+    public void setPlantBuddy(PlantBuddy plantBuddy) {
+        this.plantBuddy = plantBuddy;
     }
 
     // set listeners
@@ -117,9 +138,11 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
                 if (newStatus) {
                     holder.checkmark.setVisibility(View.VISIBLE);
+                    updatePointBalance(plantBuddyViewModel, plantBuddy, fromDifficulty(goal.getDifficulty()));
                 }
                 else {
                     holder.checkmark.setVisibility(View.GONE);
+                    updatePointBalance(plantBuddyViewModel, plantBuddy, -fromDifficulty(goal.getDifficulty()));
                 }
 
                 if (listener != null) {
@@ -326,5 +349,26 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             editEndDate = itemView.findViewById(R.id.editEndDate);
             editStartDate = itemView.findViewById(R.id.editStartDate);
         }
+    }
+
+    public void updatePointBalance(PlantBuddyViewModel plantBuddyViewModel, PlantBuddy buddy, int XP) {
+        CheckForms2025 checkform = new CheckForms2025();
+
+        username = buddy.getUsername();
+        plantname = buddy.getPlantname();
+        level = buddy.getLevel();
+        xp = buddy.getXp();
+        image = buddy.getImage();
+
+        // Adding new Points
+        xp += XP;
+
+        // Checking if user eligible for upgrade
+        doubleContainer = checkform.checkLevel(xp, level);
+        xp = doubleContainer[0];
+        level = (int)Math.round(doubleContainer[1]);
+        Log.d("INFO", username + "/" + plantname + "/" + level + "/" + xp + "/" + image);
+
+        plantBuddyViewModel.update(new PlantBuddy(username, plantname, level, xp, image));
     }
 }

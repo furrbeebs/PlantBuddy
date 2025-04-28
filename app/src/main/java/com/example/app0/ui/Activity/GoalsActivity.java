@@ -28,10 +28,12 @@ import com.example.app0.ProgressPage;
 import com.example.app0.R;
 import com.example.app0.data.Local.Entity.Goal;
 import com.example.app0.data.Local.Entity.GoalInstance;
+import com.example.app0.data.Local.Entity.PlantBuddy;
 import com.example.app0.data.Local.Entity.Sort;
 import com.example.app0.ui.Fragments.AddGoalDialogFragment;
 import com.example.app0.ui.GoalAdapter;
 import com.example.app0.ui.ViewModel.GoalsViewModel;
+import com.example.app0.ui.ViewModel.PlantBuddyViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +59,9 @@ public class GoalsActivity extends AppCompatActivity {
     private GoalsViewModel goalsViewModel;
 
     private SimpleDateFormat todayFormatter, otherFormatter, dayFormatter, dateFormatter;
+
+    private PlantBuddy buddy;
+    private PlantBuddyViewModel plantBuddyViewModel;
 
     public static boolean isSameDay(Date date1, Date date2) {
         Calendar cal1, cal2;
@@ -146,8 +151,18 @@ public class GoalsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.goalsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // TODO: Added this portion here to obtain the PlantBuddy Object
+        plantBuddyViewModel = new ViewModelProvider(this).get(PlantBuddyViewModel.class);
+        plantBuddyViewModel.getPlantBuddy().observe(this, plantBuddy -> {
+            if (plantBuddy != null) {
+                buddy = plantBuddy.get(0);
+                adapter.setPlantBuddy(buddy);
+            }
+            else { Log.d(TAG, "PlanBuddy object is null"); }
+        });
+
         goalInstances = new ArrayList<>();
-        adapter = new GoalAdapter(goalInstances);
+        adapter = new GoalAdapter(goalInstances, plantBuddyViewModel, buddy);
 
         adapter.setOnGoalChangeListener(new GoalAdapter.OnGoalChangeListener() {
             @Override
