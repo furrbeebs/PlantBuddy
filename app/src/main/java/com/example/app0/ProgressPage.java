@@ -26,7 +26,7 @@ public class ProgressPage extends AppCompatActivity {
     // Declaration of variables
     private PlantBuddyViewModel plantBuddyViewModel;
     private TextView levelIndicator, speechBubble;
-    private ProgressBar progressBar;
+    private ProgressBar progressBar, progressCircle;
     private LottieAnimationView animation;
     private ImageView goals, journal, mood;
     private int current_level;
@@ -47,15 +47,19 @@ public class ProgressPage extends AppCompatActivity {
             current_XP = plantBuddy.get(0).getXp();
 
             // Level Indicator
+            progressCircle = findViewById(R.id.progress_circle);
             levelIndicator = findViewById(R.id.levelText);
             levelIndicator.setText("Level " + Integer.toString(current_level));
 
             // Progress Bar
             progressBar = findViewById(R.id.progressBar);
+            // TODO: Add code for ProgressBar here
+
+            // Progress Circle
             CheckForms2025 checkform = new CheckForms2025();
             int maxXP = checkform.maxXP(current_level);
-            progressBar.setMax(maxXP);
-            progressBar.setProgress((int) Math.round(current_XP));
+            progressCircle.setMax(maxXP);
+            progressCircle.setProgress((int) Math.round(current_XP));
         });
 
         // Speech Bubble

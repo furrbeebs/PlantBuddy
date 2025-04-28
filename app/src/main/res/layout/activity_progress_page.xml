@@ -17,10 +17,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/circle_progress" />
+        <!--progress bar implementation-->
+        <ProgressBar
+            android:id="@+id/progress_circle"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circular_shape"
+            android:indeterminate="false"
+            android:progressDrawable="@drawable/circular_progress_bar"
+            android:textAlignment="center"
+            />
 
         <TextView
             android:id="@+id/levelText"
@@ -230,6 +237,6 @@
         </LinearLayout>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout> 
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--This xml was written with the help of AI and edited by Cho Lei Lei Mon-->
