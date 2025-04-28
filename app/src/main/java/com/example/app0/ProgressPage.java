@@ -16,6 +16,7 @@ import com.example.app0.ui.Activity.GoalsActivity;
 import com.example.app0.ui.Activity.MoodActivity;
 import com.example.app0.ui.CheckForms2025;
 import com.example.app0.ui.Fragments.MoodFragment;
+import com.example.app0.ui.ViewModel.GoalsViewModel;
 import com.example.app0.ui.ViewModel.PlantBuddyViewModel;
 import com.example.app0.utility.ModifiedObserver;
 
@@ -25,6 +26,7 @@ public class ProgressPage extends AppCompatActivity {
 
     // Declaration of variables
     private PlantBuddyViewModel plantBuddyViewModel;
+    private GoalsViewModel goalsViewModel;
     private TextView levelIndicator, speechBubble;
     private ProgressBar progressBar, progressCircle;
     private LottieAnimationView animation;
@@ -40,6 +42,7 @@ public class ProgressPage extends AppCompatActivity {
         setContentView(R.layout.activity_progress_page);
 
         plantBuddyViewModel = new ViewModelProvider(this).get(PlantBuddyViewModel.class);
+        goalsViewModel = new ViewModelProvider(this).get(GoalsViewModel.class);
 
         // Obtain PlantBuddy Object
         ModifiedObserver.observeOnce(plantBuddyViewModel.getPlantBuddy(), this, plantBuddy -> {
@@ -53,55 +56,66 @@ public class ProgressPage extends AppCompatActivity {
 
             // Progress Bar
             progressBar = findViewById(R.id.progressBar);
-            // TODO: Add code for ProgressBar here
+
+            goalsViewModel.getTodayGoalCompletionStatus().observe(this, status -> {
+                if (status.getTotal() > 0) {
+                    progressBar.setMax(status.getTotal());
+                    progressBar.setProgress(status.getCompleted());
+                } else {
+                    progressBar.setMax(1);
+                    progressBar.setProgress(0);
+                }
+            });
 
             // Progress Circle
             CheckForms2025 checkform = new CheckForms2025();
             int maxXP = checkform.maxXP(current_level);
             progressCircle.setMax(maxXP);
             progressCircle.setProgress((int) Math.round(current_XP));
+
+
+            // Speech Bubble
+            List<String> encouragement_phrases = List.of("You should be Proud", "Hang In There",
+                    "Don't be so hard on yourself", "Not all days are bad", "You're almost there",
+                    "Love Yourself", "Be kind to Yourself", "You can do it!", "Never Give Up",
+                    "Keep up the good work!", "Follow Your Dreams", "The Sky is the Limit");
+
+            speechBubble = findViewById(R.id.speechText);
+            int randomiser = (int) (Math.random() * (encouragement_phrases.size()));
+            speechBubble.setText(encouragement_phrases.get(randomiser));
+
+            // Lottie Animation Section
+            animation = findViewById(R.id.plant_animation);
+            current_form = "Sapling";   // for testing purposes
+
+            if (current_form.equals("Seedling")) {
+                animation.setAnimation(R.raw.sprout);
+            } else if (current_form.equals("Sapling")) {
+                animation.setAnimation(R.raw.budding);
+            } else if (current_form.equals("Tree")) {
+                animation.setAnimation(R.raw.flower);
+            } else {
+            }
+
+            // Bottom Navigation Section
+            goals = findViewById(R.id.goalsButton);
+            journal = findViewById(R.id.journalButton);
+            mood = findViewById(R.id.moodButton);
+
+            goals.setOnClickListener(v -> {
+                Intent intent = new Intent(ProgressPage.this, GoalsActivity.class);
+                startActivity(intent);
+            });
+
+            journal.setOnClickListener(v -> {
+
+            });
+
+            mood.setOnClickListener(v -> {
+                Intent intent = new Intent(ProgressPage.this, MoodActivity.class);
+                startActivity(intent);
+
+            });
         });
-
-        // Speech Bubble
-        List<String> encouragement_phrases = List.of("You should be Proud", "Hang In There",
-                "Don't be so hard on yourself", "Not all days are bad", "You're almost there",
-                "Love Yourself", "Be kind to Yourself", "You can do it!", "Never Give Up",
-                "Keep up the good work!", "Follow Your Dreams", "The Sky is the Limit");
-
-        speechBubble = findViewById(R.id.speechText);
-        int randomiser = (int)(Math.random()*(encouragement_phrases.size()));
-        speechBubble.setText(encouragement_phrases.get(randomiser));
-
-        // Lottie Animation Section
-        animation = findViewById(R.id.plant_animation);
-        current_form = "Sapling";   // for testing purposes
-
-        if (current_form.equals("Seedling")) { animation.setAnimation(R.raw.sprout); }
-        else if (current_form.equals("Sapling")) { animation.setAnimation(R.raw.budding); }
-        else if (current_form.equals("Tree")) { animation.setAnimation(R.raw.flower); }
-        else {}
-
-        // Bottom Navigation Section
-        goals = findViewById(R.id.goalsButton);
-        journal = findViewById(R.id.journalButton);
-        mood = findViewById(R.id.moodButton);
-
-        goals.setOnClickListener(v -> {
-            Intent intent = new Intent(ProgressPage.this, GoalsActivity.class);
-            startActivity(intent);
-        });
-
-        journal.setOnClickListener(v -> {
-
-        });
-
-        mood.setOnClickListener(v -> {
-            Intent intent = new Intent(ProgressPage.this, MoodActivity.class);
-            startActivity(intent);
-
-        });
-
-
     }
-
 }

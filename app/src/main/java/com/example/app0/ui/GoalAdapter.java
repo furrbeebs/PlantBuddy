@@ -4,12 +4,10 @@ import static com.example.app0.data.Converters.DifficultyConverter.fromDifficult
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -37,7 +35,6 @@ import com.example.app0.ui.ViewModel.PlantBuddyViewModel;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,14 +45,11 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
     private OnGoalChangeListener listener;
     private SimpleDateFormat otherFormatter;
     private boolean isPastDate = false;
-
     private PlantBuddyViewModel plantBuddyViewModel;
     private String username, plantname;
     private int level, image;
-
     private double xp;
     private double[] doubleContainer;
-
     private PlantBuddy plantBuddy;
 
     public void setIsPastDate(boolean isPastDate) {
@@ -90,7 +84,6 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         notifyDataSetChanged();
     }
 
-
     @NonNull
     @Override
     public GoalViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -101,6 +94,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull GoalViewHolder holder, int position) {
+        // hide edit container and show goal container
         holder.goalItemContainer.setVisibility(View.VISIBLE);
         holder.editGoalContainer.setVisibility(View.GONE);
 
@@ -171,6 +165,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
         // ---------- GoalItemContainer Portion ----------
         holder.editButton.setOnClickListener( v-> {
+            // hide goal container and show edit container
             holder.goalItemContainer.setVisibility(View.GONE);
             holder.editGoalContainer.setVisibility(View.VISIBLE);
 
@@ -246,9 +241,9 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             builder.setTitle("Delete Goal");
             builder.setMessage("Do you want to delete this goal instance or all recurring instances?");
 
+            // handling delete for only the specific goal instance
             builder.setPositiveButton("This Instance", (dialog, which) -> {
                 if (listener != null) {
-                    // Get the current position before removing the item
                     int adapterPosition = holder.getAdapterPosition();
                     if (adapterPosition != RecyclerView.NO_POSITION) {
 
@@ -259,13 +254,13 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
 
                         listener.onGoalDeleted(null, instance, false, dateId);
 
-                        // Remove from adapter
                         goalInstances.remove(adapterPosition);
                         notifyItemRemoved(adapterPosition);
                     }
                 }
             });
 
+            // handling delete for all goal instances of that goal + main goal object
             builder.setNegativeButton("All Instances", (dialog, which) -> {
                 if (listener != null) {
                     int adapterPosition = holder.getAdapterPosition();
@@ -327,7 +322,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         public GoalViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.goalTitle);
-            frequency= itemView.findViewById(R.id.editgoalFrequency);
+            frequency = itemView.findViewById(R.id.editgoalFrequency);
             frequencyText = itemView.findViewById(R.id.goalFrequency);
             sun_points = itemView.findViewById(R.id.sun_points);
             checkboxBackground = itemView.findViewById(R.id.checkboxBackground);
@@ -350,6 +345,7 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
         }
     }
 
+    // to update the points for the plant buddy upon completion of goal
     public void updatePointBalance(PlantBuddyViewModel plantBuddyViewModel, PlantBuddy buddy, int XP) {
         CheckForms2025 checkform = new CheckForms2025();
 

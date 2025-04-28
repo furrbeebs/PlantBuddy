@@ -6,6 +6,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.app0.data.Local.Entity.Goal;
 import com.example.app0.data.Local.Entity.GoalInstance;
@@ -77,6 +78,7 @@ public class GoalsViewModel extends AndroidViewModel {
         repository.getGoal(goalId, callback);
     }
 
+    // getting goal instances for a specific date
     public LiveData<List<GoalInstance>> getGoalInstancesForDate(Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -104,15 +106,53 @@ public class GoalsViewModel extends AndroidViewModel {
         repository.deleteGoalInstanceByGoalId(goalId);
     }
 
+    // to delete future goal instances (for manipulating goal instances after end dates are changed)
     public void deleteFutureGoalInstancesByGoalId(long goalId, Calendar today, long instanceId) {
         repository.deleteFutureGoalInstancesByGoalId(goalId, today, instanceId);
     }
 
+    // to exclude dates of deleted goal instances so they won't be recreated again
     public void excludeDateAndDeleteInstance(long goalId, String dateId, GoalInstance goalInstance) {
         repository.excludeDateAndDeleteInstance(goalId, dateId, goalInstance);
     }
 
-    public boolean isSameDay(Calendar cal1, Calendar cal2) {
-        return repository.isSameDay(cal1, cal2);
+    // to calculate and return the goal completion status to be displayed on the progress bar
+    public LiveData<GoalCompletionStatus> getTodayGoalCompletionStatus() {
+        MutableLiveData<GoalCompletionStatus> completionStatus = new MutableLiveData<>();
+        Calendar today = Calendar.getInstance();
+
+        getGoalInstancesForDate(today).observeForever(goalInstances -> {
+            int total = goalInstances.size();
+            int completed = 0;
+
+            for (GoalInstance instance : goalInstances) {
+                if (instance.getCompleted()) {
+                    completed += 1;
+                }
+            }
+
+            completionStatus.setValue(new GoalCompletionStatus(completed, total));
+        });
+
+        return completionStatus;
+    }
+
+    // clas to hold goal completion
+    public static class GoalCompletionStatus {
+        private int completed;
+        private int total;
+
+        public GoalCompletionStatus(int completed, int total) {
+            this.completed = completed;
+            this.total = total;
+        }
+
+        public int getCompleted() {
+            return completed;
+        }
+
+        public int getTotal() {
+            return total;
+        }
     }
 }
