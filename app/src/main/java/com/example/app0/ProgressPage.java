@@ -2,6 +2,7 @@ package com.example.app0;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,18 +45,18 @@ public class ProgressPage extends AppCompatActivity {
         ModifiedObserver.observeOnce(plantBuddyViewModel.getPlantBuddy(), this, plantBuddy -> {
             current_level = plantBuddy.get(0).getLevel();
             current_XP = plantBuddy.get(0).getXp();
+
+            // Level Indicator
+            levelIndicator = findViewById(R.id.levelText);
+            levelIndicator.setText("Level " + Integer.toString(current_level));
+
+            // Progress Bar
+            progressBar = findViewById(R.id.progressBar);
+            CheckForms2025 checkform = new CheckForms2025();
+            int maxXP = checkform.maxXP(current_level);
+            progressBar.setMax(maxXP);
+            progressBar.setProgress((int) Math.round(current_XP));
         });
-        // Level Indicator
-        levelIndicator = findViewById(R.id.levelText);
-        levelIndicator.setText("Level " + Integer.toString(current_level));
-
-        // Progress Bar
-        progressBar = findViewById(R.id.progressBar);
-        CheckForms2025 checkform = new CheckForms2025();
-        int maxXP = checkform.maxXP(current_level);
-        progressBar.setMax(maxXP);
-        progressBar.setProgress(900);  // Manual Entry for Testing
-
 
         // Speech Bubble
         List<String> encouragement_phrases = List.of("You should be Proud", "Hang In There",
