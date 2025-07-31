@@ -43,7 +43,14 @@ PlantBuddy contributes to sustainability by promoting mental well-being which is
 
 
 ## Screenshots
+Feature 1: Plant Companion
+![Feature 1](feature1.jpeg)
 
+Feature 2: Mood Tracker
+![Feature 2](feature2.jpeg)
+
+Feature 3: Goal Tracker
+![Feature 3](feature3.jpeg)
 
 ## Running the project locally
 1. Clone the repository
